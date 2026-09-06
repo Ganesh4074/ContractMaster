@@ -1,0 +1,8 @@
+/obj
+/properties
+/bin
+/.vs/
+/.vscode/
+*.db
+.env
+Thumbs.db
