@@ -1,6 +1,7 @@
 using ContractMaster.Data;
 using ContractMaster.DTOs;
 using ContractMaster.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContractMaster.EndPoints;
 public static class ApprovalsEndPoints
@@ -25,6 +26,22 @@ public static class ApprovalsEndPoints
             };
             await DB.AddAsync(approval);
             await DB.SaveChangesAsync();
+        });
+
+        //Get All Approvals
+        group.MapGet("/", async (ContractMasterContext DB) =>
+        {
+            return await DB.Approvals.Select(approval => new ApprovalDTO(
+                approval.Id,
+                approval.Version,
+                approval.Sequence,
+                approval.ContractId,
+                approval.ApproverId,
+                approval.ApproverType,
+                approval.ApprovalStatus,
+                approval.ApprovedAt,
+                approval.RejectedAt
+                )).ToListAsync();
         });
     }
 }
