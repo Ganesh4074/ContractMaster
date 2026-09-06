@@ -19,7 +19,7 @@ public static class ContractEndPoints
             {
                 ContractId=NewContract.ContractId,
                 ContracType=NewContract.ContracType,
-                status=NewContract.status,
+                Status=NewContract.Status,
                 StartDate=NewContract.StartDate,
                 EndDate=NewContract.EndDate,
                 CounterPartyName=NewContract.CounterPartyName,
@@ -35,12 +35,14 @@ public static class ContractEndPoints
             return await DB.Contracts.Select(contract=>new ContractDTO(
                 contract.Id,
                 contract.ContractId,
+                contract.Version,
                 contract.ContracType,
-                contract.status,
+                contract.Status,
                 contract.StartDate,
                 contract.EndDate,
                 contract.CounterPartyName,
-                contract.CounterPartyEmail
+                contract.CounterPartyEmail,
+                contract.CreatedAt
                 )).ToListAsync();
         });
     }

@@ -2,10 +2,12 @@ namespace ContractMaster.DTOs;
 
 public record ContractDTO(int Id,
     int ContractId,
+    int Version,
     string ContracType,
-    string status,
+    string Status,
     DateOnly StartDate,
     DateOnly EndDate,
     string CounterPartyName,
-    string CounterPartyEmail
+    string CounterPartyEmail,
+    DateOnly CreatedById
     );

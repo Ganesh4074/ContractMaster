@@ -3,6 +3,7 @@ using System;
 using ContractMaster.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContractMasters.Migrations
 {
     [DbContext(typeof(ContractMasterContext))]
-    partial class ContractMasterContextModelSnapshot : ModelSnapshot
+    [Migration("20260906152100_VersionsAdded")]
+    partial class VersionsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.11");
@@ -26,9 +29,6 @@ namespace ContractMasters.Migrations
                     b.Property<string>("ApprovalStatus")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly>("ApprovedAt")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("ApproverId")
                         .HasColumnType("INTEGER");
 
@@ -36,12 +36,6 @@ namespace ContractMasters.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ContractId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateOnly>("RejectedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Sequence")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Version")
@@ -77,24 +71,18 @@ namespace ContractMasters.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Version")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
