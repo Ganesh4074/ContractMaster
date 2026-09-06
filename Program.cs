@@ -7,6 +7,7 @@ builder.AddData();
 var app = builder.Build();
 app.GetUserEndPoints();
 app.GetContractEndPoints();
+app.GetApprovalsEndPoints();
 app.MigrateDB();
 app.Run();
 
