@@ -4,5 +4,7 @@ public record UserDto(
     int Id,
     string Name,
     string Department,
-    string Role
+    string Role,
+    string Email,
+    string PasswordHash
 );

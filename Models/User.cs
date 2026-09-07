@@ -5,4 +5,6 @@ public class User
     public required string Name{get;set;}
     public required string Department{get;set;}
     public required string Role{get;set;}
+    public required string EMail{get;set;}
+    public required string PasswordHash{get;set;}
 }

@@ -1,10 +1,13 @@
 namespace ContractMaster.DTOs;
 using ContractMaster.Models;
-public record NewApprovalDTO(
+public record GetApprovalDTO(
+    int Id,
     int Version,
     int Sequence,
     int ContractId,
     int ApproverId,
     string? ApproverType,
-    string? ApprovalStatus
+    string? ApprovalStatus,
+    DateOnly? ApprovedAt,
+    DateOnly? RejectedAt
 );

@@ -3,6 +3,7 @@ using ContractMaster.Data;
 using ContractMaster.DTOs;
 using ContractMaster.DTOs.ApprovalDTOs;
 using ContractMaster.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContractMaster.EndPoints;
@@ -11,16 +12,20 @@ public static class UserEndPoints
 {
     public static void GetUserEndPoints(this WebApplication app)
     {
+        PasswordHasher<User> passwordHasher=new ();
         var group = app.MapGroup("/Users");
         group.MapPost("/",async (NewUserDto NewUser, ContractMasterContext DB) =>
         {
-            User User=new()
+            User user=new()
             {
                 Name=NewUser.Name,
                 Department=NewUser.Department,
-                Role=NewUser.Role
+                Role=NewUser.Role,
+                EMail=NewUser.EMail,
+                PasswordHash=String.Empty
             };
-            await DB.Users.AddAsync(User);
+            user.PasswordHash=passwordHasher.HashPassword(user, NewUser.PasswordHash);
+            await DB.Users.AddAsync(user);
             await DB.SaveChangesAsync();
         });
         group.MapGet("/", async(ContractMasterContext DB) =>
@@ -29,7 +34,9 @@ public static class UserEndPoints
                 user.Id,
                 user.Name,
                 user.Department,
-                user.Role
+                user.Role,
+                user.EMail,
+                user.PasswordHash
             )).ToListAsync();
         });
 

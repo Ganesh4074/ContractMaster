@@ -10,6 +10,6 @@ public class Approvals
     public User Approver{get;set;}=null!;
     public string? ApproverType{get;set;}
     public string? ApprovalStatus{get;set;}
-    public DateOnly ApprovedAt{get;set;}
-    public DateOnly RejectedAt{get;set;}
+    public DateOnly? ApprovedAt{get;set;}=null;
+    public DateOnly? RejectedAt{get;set;}=null;
 }

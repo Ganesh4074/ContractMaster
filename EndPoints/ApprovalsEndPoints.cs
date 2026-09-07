@@ -21,8 +21,6 @@ public static class ApprovalsEndPoints
                 ApproverId = NewApproval.ApproverId,
                 ApproverType = NewApproval.ApproverType,
                 ApprovalStatus = NewApproval.ApprovalStatus,
-                ApprovedAt = NewApproval.ApprovedAt,
-                RejectedAt = NewApproval.RejectedAt
             };
             await DB.AddAsync(approval);
             await DB.SaveChangesAsync();
@@ -31,7 +29,7 @@ public static class ApprovalsEndPoints
         //Get All Approvals
         group.MapGet("/", async (ContractMasterContext DB) =>
         {
-            return await DB.Approvals.Select(approval => new ApprovalDTO(
+            return await DB.Approvals.Select(approval => new GetApprovalDTO(
                 approval.Id,
                 approval.Version,
                 approval.Sequence,
@@ -42,7 +40,19 @@ public static class ApprovalsEndPoints
                 approval.ApprovedAt,
                 approval.RejectedAt
                 )).ToListAsync();
-        });
+        }).RequireAuthorization();
+
+        group.MapPatch("/{id}",async (int id,UpdateApprovalDTO Update,ContractMasterContext Db) =>
+        {
+            var CurrentApproval= await Db.Approvals.FindAsync(id);
+            if(CurrentApproval is null)
+            {
+                return Results.NotFound();
+            }
+            CurrentApproval.ApprovalStatus=Update.ApprovalStatus;
+            await Db.SaveChangesAsync();
+            return Results.Ok(CurrentApproval);
+        }).RequireAuthorization(policy=>policy.RequireRole("Approver"));
 
     }
 }

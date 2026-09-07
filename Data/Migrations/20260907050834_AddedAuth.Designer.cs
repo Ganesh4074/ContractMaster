@@ -3,6 +3,7 @@ using System;
 using ContractMaster.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContractMasters.Migrations
 {
     [DbContext(typeof(ContractMasterContext))]
-    partial class ContractMasterContextModelSnapshot : ModelSnapshot
+    [Migration("20260907050834_AddedAuth")]
+    partial class AddedAuth
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.11");
@@ -26,7 +29,7 @@ namespace ContractMasters.Migrations
                     b.Property<string>("ApprovalStatus")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly?>("ApprovedAt")
+                    b.Property<DateOnly>("ApprovedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ApproverId")
@@ -38,7 +41,7 @@ namespace ContractMasters.Migrations
                     b.Property<int>("ContractId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateOnly?>("RejectedAt")
+                    b.Property<DateOnly>("RejectedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Sequence")
