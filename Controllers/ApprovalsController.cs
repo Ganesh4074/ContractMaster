@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using ContractMaster.Data;
 using ContractMaster.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using ContractMaster.Services;
-namespace ContractMaster.Controller;
+namespace ContractMaster.Controllers;
 
 [ApiController]
-[Route("/Approvals/[controller]")]
+[Route("[controller]")]
 public class ApprovalsController : ControllerBase
 {
     private readonly ApprovalService _approvalService;
@@ -15,7 +14,21 @@ public class ApprovalsController : ControllerBase
         _approvalService=approvalService;
     }
 
-    [HttpGet("id")]
+    [HttpPost]
+    public async Task<IActionResult> Create(NewApprovalDTO newApproval)
+    {
+        await _approvalService.CreateApproval(newApproval);
+        return Ok();
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetAll()
+    {
+        return Ok(await _approvalService.GetApprovals());
+    }
+
+    [HttpGet("{id}")]
     [Authorize]
     public async Task<IActionResult> GetApprovalById(int id)
     {
@@ -25,5 +38,13 @@ public class ApprovalsController : ControllerBase
             return NotFound();
         }
         return Ok(approval);
+    }
+
+    [HttpPatch("{id}")]
+    [Authorize(Roles = "Approver")]
+    public async Task<IActionResult> Update(int id, UpdateApprovalDTO update)
+    {
+        var approval = await _approvalService.UpdateApproval(id, update);
+        return approval is null ? NotFound() : Ok(approval);
     }
 }

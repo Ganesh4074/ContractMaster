@@ -2,7 +2,6 @@ using System.Security;
 using System.Text;
 using ContractMaster.Configurations;
 using ContractMaster.Data;
-using ContractMaster.EndPoints;
 using ContractMaster.Models;
 using ContractMaster.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -56,19 +55,16 @@ builder.Services.AddSwaggerGen(options =>
     new OpenApiSecurityRequirement
     {
         [
-
         new OpenApiSecuritySchemeReference("Bearer",document)
         ]=[]
     });
 });
 builder.Services.AddControllers();
 builder.Services.AddScoped<ApprovalService>();
+builder.Services.AddScoped<ContractService>();
+builder.Services.AddScoped<UserService>();
 var app = builder.Build();
 app.MapControllers();
-app.GetUserEndPoints();
-app.GetContractEndPoints();
-app.GetApprovalsEndPoints();
-app.GetAuthEndPoints();
 app.MigrateDB();
 app.UseSwagger();
 app.UseSwaggerUI();
