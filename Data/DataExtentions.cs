@@ -13,7 +13,7 @@ public static class DataExtention
     }
     public static void AddData(this WebApplicationBuilder builder)
     {
-        var connString="Data Source=ContractMaster.db";
-        builder.Services.AddSqlite<ContractMasterContext>(connString);
+        
+        builder.Services.AddSqlite<ContractMasterContext>(builder.Configuration.GetConnectionString("ConnString"));
     }
 }

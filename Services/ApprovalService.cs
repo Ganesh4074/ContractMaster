@@ -71,6 +71,18 @@ public class ApprovalService
             return null;
         }
         approval.ApprovalStatus = update.ApprovalStatus;
+        if(update.ApprovalStatus=="Approved")
+        {
+            approval.ApprovedAt=update.Date;
+        }
+        else if(update.ApprovalStatus=="Rejected")
+        {
+            approval.RejectedAt=update.Date;
+        }
+        else
+        {
+            throw new Exception("Approval Status not allowed");
+        }
         await _db.SaveChangesAsync();
         return approval;
     }

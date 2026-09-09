@@ -17,7 +17,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles ="Admin")]
+    [Authorize/*(Roles = "Admin")*/]
     public async Task<IActionResult> Create(NewUserDto newUser)
     {
         await _userService.CreateUser(newUser);
@@ -25,7 +25,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles ="Admin")]
+    [Authorize/*(Roles = "Admin")*/]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _userService.GetUsers());

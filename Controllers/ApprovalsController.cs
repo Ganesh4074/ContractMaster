@@ -41,7 +41,7 @@ public class ApprovalsController : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Roles = "Approver")]
+    [Authorize/*(Roles = "Approver")*/]
     public async Task<IActionResult> Update(int id, UpdateApprovalDTO update)
     {
         var approval = await _approvalService.UpdateApproval(id, update);

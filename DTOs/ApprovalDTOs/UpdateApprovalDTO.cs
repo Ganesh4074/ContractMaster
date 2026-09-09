@@ -1,4 +1,5 @@
 namespace ContractMaster.DTOs;
 public record UpdateApprovalDTO(
-    string ApprovalStatus
+    string ApprovalStatus,
+    DateOnly Date
 );
