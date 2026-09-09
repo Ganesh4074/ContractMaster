@@ -47,4 +47,12 @@ public class ApprovalsController : ControllerBase
         var approval = await _approvalService.UpdateApproval(id, update);
         return approval is null ? NotFound() : Ok(approval);
     }
+
+    [HttpGet("Get-Error")]
+    public async Task<IActionResult> Error()
+    {
+        var k=100;
+        var z=0;
+        return Ok(k/z);
+    }
 }

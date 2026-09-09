@@ -28,7 +28,7 @@ public class AuthService{
         var user=await _db.Users.FirstOrDefaultAsync(user=>user.EMail==request.Email);
         if(user is null)
         {
-            return null;
+            return null!;
         }
         var PasswordResult=_passwordHasher.VerifyHashedPassword(user,user.PasswordHash,request.Password);
         if (PasswordResult==PasswordVerificationResult.Failed)
