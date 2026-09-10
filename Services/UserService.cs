@@ -1,20 +1,21 @@
-using ContractMaster.Data;
 using ContractMaster.DTOs;
 using ContractMaster.DTOs.ApprovalDTOs;
 using ContractMaster.Models;
+using ContractMaster.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace ContractMaster.Services;
 
 public class UserService
 {
-    private readonly ContractMasterContext _db;
+    private readonly IUserRepository _repository;
     private readonly IPasswordHasher<User> _passwordHasher;
 
-    public UserService(ContractMasterContext db, IPasswordHasher<User> passwordHasher)
+    public UserService(
+        IUserRepository repository,
+        IPasswordHasher<User> passwordHasher)
     {
-        _db = db;
+        _repository = repository;
         _passwordHasher = passwordHasher;
     }
 
@@ -28,32 +29,37 @@ public class UserService
             EMail = newUser.EMail,
             PasswordHash = string.Empty
         };
-        user.PasswordHash = _passwordHasher.HashPassword(user, newUser.PasswordHash);
-        await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
+
+        user.PasswordHash = _passwordHasher.HashPassword(
+            user,
+            newUser.PasswordHash
+        );
+
+        await _repository.AddAsync(user);
     }
 
     public async Task<List<UserDto>> GetUsers()
     {
-        return await _db.Users.Select(user => new UserDto(
+        var users = await _repository.GetAllAsync();
+
+        return users.Select(user => new UserDto(
             user.Id,
             user.Name,
             user.Department,
             user.Role,
-            user.EMail,
-            user.PasswordHash
-        )).ToListAsync();
+            user.EMail
+        )).ToList();
     }
 
     public async Task<List<PendingApprovalsDTO>> GetPendingApprovals(int id)
     {
-        return await _db.Approvals.Where(approval =>
-            approval.ApproverId == id && approval.ApprovalStatus == "Pending"
-        ).Select(approval => new PendingApprovalsDTO(
+        var approvals = await _repository.GetPendingApprovalsAsync(id);
+
+        return approvals.Select(approval => new PendingApprovalsDTO(
             approval.ContractId,
             approval.Version,
             approval.ApproverId,
             approval.Sequence
-        )).ToListAsync();
+        )).ToList();
     }
 }

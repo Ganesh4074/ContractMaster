@@ -1,41 +1,54 @@
-using System.Diagnostics.Contracts;
-using ContractMaster.Data;
 using ContractMaster.DTOs;
 using ContractMaster.Models;
+using ContractMaster.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace ContractMaster.Services;
 
-public class AuthService{
-    private readonly ContractMasterContext _db;
+public class AuthService
+{
+    private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly JwtService _jwtService;
-    public AuthService(ContractMasterContext db, IPasswordHasher<User> passwordHasher, JwtService jwtService)
-    {
-        _db=db;
-        _passwordHasher=passwordHasher;
-        _jwtService=jwtService;
 
+    public AuthService(
+        IUserRepository userRepository,
+        IPasswordHasher<User> passwordHasher,
+        JwtService jwtService)
+    {
+        _userRepository = userRepository;
+        _passwordHasher = passwordHasher;
+        _jwtService = jwtService;
     }
 
     public async Task<LoginResponseDTO> Login(LoginRequestDTO request)
     {
-        if(String.IsNullOrWhiteSpace(request.Email) || String.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Password))
         {
             return null!;
         }
-        var user=await _db.Users.FirstOrDefaultAsync(user=>user.EMail==request.Email);
-        if(user is null)
+
+        var user = await _userRepository.GetByEmailAsync(request.Email);
+
+        if (user is null)
         {
             return null!;
         }
-        var PasswordResult=_passwordHasher.VerifyHashedPassword(user,user.PasswordHash,request.Password);
-        if (PasswordResult==PasswordVerificationResult.Failed)
+
+        var passwordResult = _passwordHasher.VerifyHashedPassword(
+            user,
+            user.PasswordHash,
+            request.Password
+        );
+
+        if (passwordResult == PasswordVerificationResult.Failed)
         {
             return null!;
         }
-        var Token=_jwtService.GenerateToken(user);
-        return new LoginResponseDTO(Token);
+
+        var token = _jwtService.GenerateToken(user);
+
+        return new LoginResponseDTO(token);
     }
 }

@@ -5,4 +5,5 @@
 /.vscode/
 *.db
 .env
-Thumbs.db
+/.appsettings.Development.json
+/.appsettings.json

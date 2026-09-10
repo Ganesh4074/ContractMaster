@@ -5,6 +5,5 @@ public record UserDto(
     string Name,
     string Department,
     string Role,
-    string Email,
-    string PasswordHash
-);
+    string Email
+    );

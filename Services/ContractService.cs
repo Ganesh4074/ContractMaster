@@ -1,17 +1,16 @@
-using ContractMaster.Data;
 using ContractMaster.DTOs;
 using ContractMaster.Models;
-using Microsoft.EntityFrameworkCore;
+using ContractMaster.Repositories.Interfaces;
 
 namespace ContractMaster.Services;
 
 public class ContractService
 {
-    private readonly ContractMasterContext _db;
+    private readonly IContractRepository _repository;
 
-    public ContractService(ContractMasterContext db)
+    public ContractService(IContractRepository repository)
     {
-        _db = db;
+        _repository = repository;
     }
 
     public async Task CreateContract(NewContractDTO newContract)
@@ -29,13 +28,15 @@ public class ContractService
             CreatedById = newContract.CreatedById,
             CreatedAt = newContract.CreatedAt
         };
-        await _db.Contracts.AddAsync(contract);
-        await _db.SaveChangesAsync();
+
+        await _repository.AddAsync(contract);
     }
 
     public async Task<List<ContractDTO>> GetContracts()
     {
-        return await _db.Contracts.Select(contract => new ContractDTO(
+        var contracts = await _repository.GetAllAsync();
+
+        return contracts.Select(contract => new ContractDTO(
             contract.Id,
             contract.ContractId,
             contract.Version,
@@ -46,6 +47,18 @@ public class ContractService
             contract.CounterPartyName,
             contract.CounterPartyEmail,
             contract.CreatedAt
-        )).ToListAsync();
+        )).ToList();
+    }
+
+    public async Task DeleteById(int id)
+    {
+        var contract = await _repository.GetByIdAsync(id);
+
+        if (contract == null)
+        {
+            throw new FileNotFoundException();
+        }
+
+        await _repository.DeleteAsync(contract);
     }
 }
