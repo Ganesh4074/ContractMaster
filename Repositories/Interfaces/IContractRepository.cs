@@ -12,4 +12,7 @@ public interface IContractRepository
 
     Task DeleteAsync(Contract contract);
     Task<bool> ExistsAsync(int contractId, int version);
+    Task UpdateAsync(Contract contract);
+    Task<Contract?> GetByContractAndVersionAsync(int contractId, int version);
+
 }

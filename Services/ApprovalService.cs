@@ -118,7 +118,7 @@ public class ApprovalService
         {
             var approvals = await _repository.GetByContractAndVersionAsync(approval.ContractId, approval.Version);
 
-            var allApproved = approvals.Count == 3 &&approvals.All(a =>
+            var allApproved = approvals.All(a =>
                     a.ApprovalStatus == ApprovalStatus.Approved);
 
             if (allApproved)

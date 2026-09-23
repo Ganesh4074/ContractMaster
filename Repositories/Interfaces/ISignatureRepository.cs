@@ -13,4 +13,5 @@ public interface ISignatureRepository
     Task<Signature?> GetByIdAsync(int id);
 
     Task UpdateAsync(Signature signature);
+    public Task<List<Signature>> GetByContractAndVersionAsync(int contractId, int version);
 }

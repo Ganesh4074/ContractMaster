@@ -1,4 +1,5 @@
 using ContractMaster.DTOs;
+using ContractMaster.Exceptions;
 using ContractMaster.Models;
 using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
@@ -102,5 +103,19 @@ public class ContractService
         }
 
         await _repository.DeleteAsync(contract);
+    }
+    public async Task UpdateStatus(int contractId, int version, ContractStatus status)
+    {
+        var contract = await _repository.GetByContractAndVersionAsync(contractId, version);
+
+        if(contract is null)
+        {
+            throw new BusinessRuleException(
+                "Contract not found.");
+        }
+
+        contract.Status = status;
+
+        await _repository.UpdateAsync(contract);
     }
 }
