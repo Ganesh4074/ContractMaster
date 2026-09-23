@@ -17,14 +17,11 @@ public class ContractService
 
     public async Task CreateContract(NewContractDTO newContract)
 {
-    var exists = await _repository.ExistsAsync(
-        newContract.ContractId,
-        newContract.Version);
+    var exists = await _repository.ExistsAsync(newContract.ContractId, newContract.Version);
 
     if (exists)
     {
-        throw new InvalidOperationException(
-            "Contract already exists for this version.");
+        throw new InvalidOperationException("Contract already exists for this version.");
     }
 
     Contract contract = new()
@@ -99,7 +96,7 @@ public class ContractService
     {
         var contract = await _repository.GetByIdAsync(id);
 
-        if (contract == null)
+        if(contract == null)
         {
             throw new FileNotFoundException();
         }

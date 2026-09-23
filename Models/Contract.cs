@@ -14,7 +14,7 @@ public class Contract
     public required string CounterPartyName{get;set;}
     public required string CounterPartyEmail{get;set;}
     public int CreatedById{get;set;}
-    public User User=null!;
+    public User? User;
     public DateOnly CreatedAt{get;set;}
     
 }

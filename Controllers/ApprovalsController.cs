@@ -29,7 +29,7 @@ public class ApprovalsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles ="Admin,Approver")]
+    [Authorize(Roles ="Administrator,Approver")]
     public async Task<IActionResult> GetApprovalById(int id)
     {
         var approval=await _approvalService.GetApprovalById(id);
@@ -41,7 +41,7 @@ public class ApprovalsController : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Roles = "Approver,Admin")]
+    [Authorize(Roles = "Approver,Administrator")]
     public async Task<IActionResult> Update(int id, UpdateApprovalDTO update)
     {
         var approval = await _approvalService.UpdateApproval(id, update);

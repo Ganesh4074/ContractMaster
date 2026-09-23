@@ -1,0 +1,42 @@
+using ContractMaster.DTOs;
+using ContractMaster.Models;
+using ContractMaster.Repositories.Interfaces;
+
+namespace ContractMaster.Services;
+
+public class CommentService
+{
+    private readonly ICommentRepository _repository;
+
+    public CommentService(ICommentRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<List<CommentDTO>> GetComments(int contractId, int version)
+    {
+        var comments = await _repository.GetByContractIdVersionAsync(contractId, version);
+
+        return comments.Select(comment => new CommentDTO(
+                comment.Id,
+                comment.ContractId,
+                comment.Version,
+                comment.UserId,
+                comment.CommentText,
+                comment.CreatedAt)).ToList();
+    }
+
+    public async Task CreateComment(NewCommentDTO newComment, int userId)
+    {
+        var comment = new Comment
+        {
+            ContractId = newComment.ContractId,
+            Version=newComment.Version,
+            UserId = userId,
+            CommentText = newComment.CommentText,
+            CreatedAt = DateOnly.FromDateTime(DateTime.UtcNow)
+        };
+
+        await _repository.AddAsync(comment);
+    }
+}

@@ -26,11 +26,10 @@ public class UserRepository : IUserRepository
         return await _db.Users.ToListAsync();
     }
 
-    public async Task<List<Approvals>> GetPendingApprovalsAsync(int id)
+    public async Task<List<Approvals>> GetPendingApprovalsAsync()
     {
         return await _db.Approvals
             .Where(approval =>
-                approval.ApproverId == id &&
                 approval.ApprovalStatus == ApprovalStatus.Pending)
             .ToListAsync();
     }

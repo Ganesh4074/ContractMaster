@@ -8,5 +8,6 @@ public class ContractMasterContext(DbContextOptions<ContractMasterContext> optio
     public DbSet<User> Users=>Set<User>();
     public DbSet<Approvals> Approvals=>Set<Approvals>();
     public DbSet<Signature> Signatures=>Set<Signature>();
+    public DbSet<Comment> Comments { get; set; }
 
 }

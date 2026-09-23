@@ -11,10 +11,7 @@ public class AuthService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly JwtService _jwtService;
 
-    public AuthService(
-        IUserRepository userRepository,
-        IPasswordHasher<User> passwordHasher,
-        JwtService jwtService)
+    public AuthService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher, JwtService jwtService)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
@@ -23,9 +20,8 @@ public class AuthService
 
     public async Task<LoginResponseDTO> Login(LoginRequestDTO request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) ||
-            string.IsNullOrWhiteSpace(request.Password))
-        {
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        { 
             return null!;
         }
 
@@ -36,7 +32,7 @@ public class AuthService
             return null!;
         }
 
-        PasswordVerificationResult passwordResult = _passwordHasher.VerifyHashedPassword(
+        PasswordVerificationResult passwordResult= _passwordHasher.VerifyHashedPassword(
             user,
             user.PasswordHash,
             request.Password

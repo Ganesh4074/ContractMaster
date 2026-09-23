@@ -1,5 +1,6 @@
 using ContractMaster.DTOs;
 using ContractMaster.DTOs.ApprovalDTOs;
+using ContractMaster.Exceptions;
 using ContractMaster.Models;
 using ContractMaster.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -21,10 +22,14 @@ public class UserService
 
     public async Task CreateUser(NewUserDto newUser)
     {
+        if(await _repository.GetByEmailAsync(newUser.EMail)!=null)
+        {
+            throw new BusinessRuleException("user with email already exists");
+        }
         User user = new()
         {
             Name = newUser.Name,
-            Department = newUser.Department,
+            DepartmentId = newUser.DepartmentId,
             Role = newUser.Role,
             EMail = newUser.EMail,
             PasswordHash = string.Empty
@@ -45,15 +50,15 @@ public class UserService
         return users.Select(user => new UserDto(
             user.Id,
             user.Name,
-            user.Department,
+            user.DepartmentId,
             user.Role,
             user.EMail
         )).ToList();
     }
 
-    public async Task<List<PendingApprovalsDTO>> GetPendingApprovals(int id)
+    public async Task<List<PendingApprovalsDTO>> GetPendingApprovals()
     {
-        var approvals = await _repository.GetPendingApprovalsAsync(id);
+        var approvals = await _repository.GetPendingApprovalsAsync();
 
         return approvals.Select(approval => new PendingApprovalsDTO(
             approval.ContractId,

@@ -32,10 +32,10 @@ public class UserController : ControllerBase
         return Ok(await _userService.GetUsers());
     }
 
-    [HttpGet("Approver/{id}/pending")]
+    [HttpGet("Approvals/pending")]
     [Authorize]
-    public async Task<IActionResult> GetPendingApprovals(int id)
+    public async Task<IActionResult> GetPendingApprovals()
     {
-        return Ok(await _userService.GetPendingApprovals(id));
+        return Ok(await _userService.GetPendingApprovals());
     }
 }

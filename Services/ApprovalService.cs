@@ -1,8 +1,8 @@
 using ContractMaster.DTOs;
+using ContractMaster.Exceptions;
 using ContractMaster.Models;
 using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ContractMaster.Services;
 
@@ -11,9 +11,7 @@ public class ApprovalService
     private readonly IApprovalRepository _repository;
     private readonly SignatureService _signatureService;
 
-    public ApprovalService(
-        IApprovalRepository repository,
-        SignatureService signatureService)
+    public ApprovalService(IApprovalRepository repository, SignatureService signatureService)
     {
         _repository = repository;
         _signatureService = signatureService;
@@ -73,9 +71,7 @@ public class ApprovalService
         )).ToList();
     }
 
-    public async Task<GetApprovalDTO?> UpdateApproval(
-        int id,
-        UpdateApprovalDTO update)
+    public async Task<GetApprovalDTO?> UpdateApproval(int id, UpdateApprovalDTO update)
     {
         var approval = await _repository.GetByIdAsync(id);
 
@@ -83,11 +79,23 @@ public class ApprovalService
         {
             return null;
         }
-
-        approval.ApprovalStatus = update.ApprovalStatus;
-
+        //Check for previous approval
         if (update.ApprovalStatus == ApprovalStatus.Approved)
         {
+            // First approval has no previous approval to check
+            if (approval.Sequence > 1)
+            {
+                var approvals = await _repository.GetByContractAndVersionAsync(approval.ContractId, approval.Version);
+
+                var previousApproval = approvals.FirstOrDefault(a =>
+                        a.Sequence == approval.Sequence - 1);
+
+                if (previousApproval is null || previousApproval.ApprovalStatus != ApprovalStatus.Approved)
+                {
+                    throw new BusinessRuleException("Previous approval is still pending.");
+                }
+            }
+
             approval.ApprovedAt = update.Date;
             approval.RejectedAt = null;
         }
@@ -98,28 +106,24 @@ public class ApprovalService
         }
         else
         {
-            throw new Exception("Approval status not allowed.");
+            throw new BusinessRuleException(
+                "Approval status not allowed.");
         }
+
+        approval.ApprovalStatus = update.ApprovalStatus;
 
         await _repository.UpdateAsync(approval);
 
         if (update.ApprovalStatus == ApprovalStatus.Approved)
         {
-            var approvals = await _repository
-                .GetByContractAndVersionAsync(
-                    approval.ContractId,
-                    approval.Version);
+            var approvals = await _repository.GetByContractAndVersionAsync(approval.ContractId, approval.Version);
 
-            var allApproved =
-                approvals.Count == 3 &&
-                approvals.All(a =>
+            var allApproved = approvals.Count == 3 &&approvals.All(a =>
                     a.ApprovalStatus == ApprovalStatus.Approved);
 
             if (allApproved)
             {
-                await _signatureService.CreateSignatures(
-                    approval.ContractId,
-                    approval.Version);
+                await _signatureService.CreateSignatures(approval.ContractId, approval.Version);
             }
         }
 

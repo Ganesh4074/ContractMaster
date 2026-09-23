@@ -10,5 +10,5 @@ public interface IUserRepository
 
     Task<User?> GetByEmailAsync(string email);
 
-    Task<List<Approvals>> GetPendingApprovalsAsync(int id);
+    Task<List<Approvals>> GetPendingApprovalsAsync();
 }

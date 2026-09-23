@@ -15,13 +15,10 @@ public class SignatureService
         _repository = repository;
     }
 
-    public async Task CreateSignatures(
-        int contractId,
-        int version)
+    public async Task CreateSignatures(int contractId, int version)
     {
-        var exists = await _repository.ExistsAsync(
-            contractId,
-            version);
+        //Check if same contract version exists
+        var exists = await _repository.ExistsAsync(contractId, version);
 
         if (exists)
         {
@@ -70,13 +67,13 @@ public class SignatureService
 
     public async Task<GetSignatureDTO> UpdateSignature(
         int id,
-        UpdateSignatureDTO update)
+        UpdateSignatureDTO update, int userId)
     {
         var signature = await _repository.GetByIdAsync(id);
 
         if (signature is null)
         {
-            return null;
+            return null!;
         }
 
         if (signature.SignatureStatus == SignatureStatus.Signed)
@@ -91,6 +88,7 @@ public class SignatureService
         }
 
         signature.SignatureStatus = SignatureStatus.Signed;
+        signature.SignatoryId=userId;
 
         await _repository.UpdateAsync(signature);
 

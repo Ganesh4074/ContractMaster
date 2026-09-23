@@ -3,7 +3,7 @@ namespace ContractMaster.DTOs;
 public record UserDto(
     int Id,
     string Name,
-    string Department,
+    int DepartmentId,
     string Role,
     string Email
     );

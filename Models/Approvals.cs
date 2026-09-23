@@ -7,9 +7,9 @@ public class Approvals
     public required int Version{get;set;}
     public required int Sequence{get;set;}
     public required int ContractId{get;set;}
-    public Contract Contract{get;set;}=null!;
+    public Contract? Contract;
     public required int ApproverId{get;set;}
-    public User Approver{get;set;}=null!;
+    public User? Approver;
     public ApproverType ApproverType{get;set;}
     public ApprovalStatus ApprovalStatus { get; set; }
     public DateOnly? ApprovedAt{get;set;}=null;
