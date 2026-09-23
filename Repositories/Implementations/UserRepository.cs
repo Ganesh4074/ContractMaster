@@ -1,5 +1,6 @@
 using ContractMaster.Data;
 using ContractMaster.Models;
+using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,12 +31,13 @@ public class UserRepository : IUserRepository
         return await _db.Approvals
             .Where(approval =>
                 approval.ApproverId == id &&
-                approval.ApprovalStatus == "Pending")
+                approval.ApprovalStatus == ApprovalStatus.Pending)
             .ToListAsync();
     }
+
     public async Task<User?> GetByEmailAsync(string email)
-{
-    return await _db.Users
-        .FirstOrDefaultAsync(user => user.EMail == email);
-}
+    {
+        return await _db.Users
+            .FirstOrDefaultAsync(user => user.EMail == email);
+    }
 }

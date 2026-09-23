@@ -36,4 +36,8 @@ public class ContractRepository : IContractRepository
         _db.Contracts.Remove(contract);
         await _db.SaveChangesAsync();
     }
+    public async Task<bool> ExistsAsync(int contractId, int version)
+    {
+        return await _db.Contracts.AnyAsync(contract=> contract.ContractId==contractId && contract.Version==version);
+    }
 }

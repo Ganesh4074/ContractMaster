@@ -11,4 +11,5 @@ public interface IContractRepository
     Task<Contract?> GetByIdAsync(int id);
 
     Task DeleteAsync(Contract contract);
+    Task<bool> ExistsAsync(int contractId, int version);
 }

@@ -33,6 +33,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("Approver/{id}/pending")]
+    [Authorize]
     public async Task<IActionResult> GetPendingApprovals(int id)
     {
         return Ok(await _userService.GetPendingApprovals(id));

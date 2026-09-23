@@ -35,4 +35,17 @@ public class ApprovalRepository : IApprovalRepository
         _db.Approvals.Update(approval);
         await _db.SaveChangesAsync();
     }
+    public async Task<List<Approvals>> GetByContractAndVersionAsync(int contractId, int version)
+    {
+        return await _db.Approvals
+            .Where(a =>
+                a.ContractId == contractId &&
+                a.Version == version)
+            .ToListAsync();
+    }
+    public async Task AddRangeAsync(List<Approvals> approvals)
+    {
+        await _db.Approvals.AddRangeAsync(approvals);
+        await _db.SaveChangesAsync();
+    }
 }

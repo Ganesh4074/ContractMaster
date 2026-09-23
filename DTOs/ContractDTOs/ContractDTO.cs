@@ -1,10 +1,12 @@
+using ContractMaster.Models.Enums;
+
 namespace ContractMaster.DTOs;
 
 public record ContractDTO(int Id,
     int ContractId,
     int Version,
-    string ContracType,
-    string Status,
+    ContractType ContractType,
+    ContractStatus Status,
     DateOnly StartDate,
     DateOnly EndDate,
     string CounterPartyName,

@@ -11,38 +11,47 @@ namespace ContractMaster.Services;
 public class JwtService
 {
     private readonly JWTSettings _settings;
+
     public JwtService(IOptions<JWTSettings> settings)
     {
-        _settings=settings.Value;
+        _settings = settings.Value;
     }
+
     public string GenerateToken(User user)
     {
-        var Claims = new[]
+        var claims = new[]
         {
             new Claim(
-                JwtRegisteredClaimNames.Sub,user.Id.ToString()
+                JwtRegisteredClaimNames.Sub,
+                user.Id.ToString()
             ),
             new Claim(
-                JwtRegisteredClaimNames.Email,user.EMail.ToString()
+                JwtRegisteredClaimNames.Email,
+                user.EMail
             ),
             new Claim(
-                ClaimTypes.Role,user.Role.ToString()
+                ClaimTypes.Role,
+                user.Role.ToString()
             )
         };
-        var key=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
 
-        var Credentials=new SigningCredentials(
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_settings.Key));
+
+        var credentials = new SigningCredentials(
             key,
             SecurityAlgorithms.HmacSha256
         );
 
-        var Token=new JwtSecurityToken(
-            issuer:_settings.Issuer,
-            audience:_settings.Audience,
-            claims:Claims,
-            expires:DateTime.UtcNow.AddMinutes(30),
-            signingCredentials:Credentials
+        var token = new JwtSecurityToken(
+            issuer: _settings.Issuer,
+            audience: _settings.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(
+                _settings.ExpiryMinutes),
+            signingCredentials: credentials
         );
-        return new JwtSecurityTokenHandler().WriteToken(Token);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

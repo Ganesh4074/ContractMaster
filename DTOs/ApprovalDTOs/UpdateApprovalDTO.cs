@@ -1,5 +1,7 @@
+using ContractMaster.Models.Enums;
+
 namespace ContractMaster.DTOs;
 public record UpdateApprovalDTO(
-    string ApprovalStatus,
+    ApprovalStatus ApprovalStatus,
     DateOnly Date
 );

@@ -36,6 +36,11 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 problemDetails.Title = "Conflict";
                 problemDetails.Detail = exception.Message;
                 break;
+            case BusinessRuleException:
+                problemDetails.Status = (int)HttpStatusCode.BadRequest;
+                problemDetails.Title = "Business Rule Violation";
+                problemDetails.Detail = exception.Message;
+                break;
 
             default:
                 problemDetails.Status = (int)HttpStatusCode.InternalServerError;

@@ -4,5 +4,5 @@ public record NewUserDto(
     string Department,
     string Role,
     string EMail,
-    string PasswordHash
+    string Password
 );

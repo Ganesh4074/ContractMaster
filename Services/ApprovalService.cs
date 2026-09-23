@@ -1,16 +1,22 @@
 using ContractMaster.DTOs;
 using ContractMaster.Models;
+using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ContractMaster.Services;
 
 public class ApprovalService
 {
     private readonly IApprovalRepository _repository;
+    private readonly SignatureService _signatureService;
 
-    public ApprovalService(IApprovalRepository repository)
+    public ApprovalService(
+        IApprovalRepository repository,
+        SignatureService signatureService)
     {
         _repository = repository;
+        _signatureService = signatureService;
     }
 
     public async Task<GetApprovalDTO?> GetApprovalById(int id)
@@ -67,7 +73,7 @@ public class ApprovalService
         )).ToList();
     }
 
-    public async Task<Approvals?> UpdateApproval(
+    public async Task<GetApprovalDTO?> UpdateApproval(
         int id,
         UpdateApprovalDTO update)
     {
@@ -80,21 +86,53 @@ public class ApprovalService
 
         approval.ApprovalStatus = update.ApprovalStatus;
 
-        if (update.ApprovalStatus == "Approved")
+        if (update.ApprovalStatus == ApprovalStatus.Approved)
         {
             approval.ApprovedAt = update.Date;
+            approval.RejectedAt = null;
         }
-        else if (update.ApprovalStatus == "Rejected")
+        else if (update.ApprovalStatus == ApprovalStatus.Rejected)
         {
             approval.RejectedAt = update.Date;
+            approval.ApprovedAt = null;
         }
         else
         {
-            throw new Exception("Approval Status not allowed");
+            throw new Exception("Approval status not allowed.");
         }
 
         await _repository.UpdateAsync(approval);
 
-        return approval;
+        if (update.ApprovalStatus == ApprovalStatus.Approved)
+        {
+            var approvals = await _repository
+                .GetByContractAndVersionAsync(
+                    approval.ContractId,
+                    approval.Version);
+
+            var allApproved =
+                approvals.Count == 3 &&
+                approvals.All(a =>
+                    a.ApprovalStatus == ApprovalStatus.Approved);
+
+            if (allApproved)
+            {
+                await _signatureService.CreateSignatures(
+                    approval.ContractId,
+                    approval.Version);
+            }
+        }
+
+        return new GetApprovalDTO(
+            approval.Id,
+            approval.Version,
+            approval.Sequence,
+            approval.ContractId,
+            approval.ApproverId,
+            approval.ApproverType,
+            approval.ApprovalStatus,
+            approval.ApprovedAt,
+            approval.RejectedAt
+        );
     }
 }

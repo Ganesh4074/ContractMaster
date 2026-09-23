@@ -1,3 +1,5 @@
+using ContractMaster.Models.Enums;
+
 namespace ContractMaster.Models;
 public class Signature
 {
@@ -6,6 +8,6 @@ public class Signature
     public int Version{get;set;}
     public int SignatoryId{get;set;}
     public User? User{get;set;}=null;
-    public int SignatureType{get;set;}
-    public int SignatureStatus{get;set;}
+    public SignatureType SignatureType { get; set; }
+    public SignatureStatus SignatureStatus { get; set; }
 }

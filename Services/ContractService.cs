@@ -1,5 +1,6 @@
 using ContractMaster.DTOs;
 using ContractMaster.Models;
+using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
 
 namespace ContractMaster.Services;
@@ -7,30 +8,74 @@ namespace ContractMaster.Services;
 public class ContractService
 {
     private readonly IContractRepository _repository;
-
-    public ContractService(IContractRepository repository)
+    private readonly IApprovalRepository _approvalRepository;
+    public ContractService(IContractRepository repository, IApprovalRepository approvalRepository)
     {
         _repository = repository;
+        _approvalRepository=approvalRepository;
     }
 
     public async Task CreateContract(NewContractDTO newContract)
-    {
-        Contract contract = new()
-        {
-            ContractId = newContract.ContractId,
-            Version = newContract.Version,
-            ContracType = newContract.ContracType,
-            Status = newContract.Status,
-            StartDate = newContract.StartDate,
-            EndDate = newContract.EndDate,
-            CounterPartyName = newContract.CounterPartyName,
-            CounterPartyEmail = newContract.CounterPartyEmail,
-            CreatedById = newContract.CreatedById,
-            CreatedAt = newContract.CreatedAt
-        };
+{
+    var exists = await _repository.ExistsAsync(
+        newContract.ContractId,
+        newContract.Version);
 
-        await _repository.AddAsync(contract);
+    if (exists)
+    {
+        throw new InvalidOperationException(
+            "Contract already exists for this version.");
     }
+
+    Contract contract = new()
+    {
+        ContractId = newContract.ContractId,
+        Version = newContract.Version,
+        ContractType = newContract.ContractType,
+        Status = newContract.Status,
+        StartDate = newContract.StartDate,
+        EndDate = newContract.EndDate,
+        CounterPartyName = newContract.CounterPartyName,
+        CounterPartyEmail = newContract.CounterPartyEmail,
+        CreatedById = newContract.CreatedById,
+        CreatedAt = newContract.CreatedAt
+    };
+
+    await _repository.AddAsync(contract);
+
+    var approvals = new List<Approvals>
+    {
+        new()
+        {
+            Version = contract.Version,
+            Sequence = 1,
+            ContractId = contract.Id,
+            ApproverId = 1,
+            ApproverType = ApproverType.Legal,
+            ApprovalStatus = ApprovalStatus.Pending
+        },
+        new()
+        {
+            Version = contract.Version,
+            Sequence = 2,
+            ContractId = contract.Id,
+            ApproverId = 1,
+            ApproverType = ApproverType.Internal,
+            ApprovalStatus = ApprovalStatus.Pending
+        },
+        new()
+        {
+            Version = contract.Version,
+            Sequence = 3,
+            ContractId = contract.Id,
+            ApproverId = 1,
+            ApproverType = ApproverType.External,
+            ApprovalStatus = ApprovalStatus.Pending
+        }
+    };
+
+    await _approvalRepository.AddRangeAsync(approvals);
+}
 
     public async Task<List<ContractDTO>> GetContracts()
     {
@@ -40,7 +85,7 @@ public class ContractService
             contract.Id,
             contract.ContractId,
             contract.Version,
-            contract.ContracType,
+            contract.ContractType,
             contract.Status,
             contract.StartDate,
             contract.EndDate,

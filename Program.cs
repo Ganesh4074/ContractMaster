@@ -29,10 +29,14 @@ var jwtSettings = builder.Configuration
 builder.Services.AddScoped<IApprovalRepository, ApprovalRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IApprovalRepository, ApprovalRepository>();
+builder.Services.AddScoped<ISignatureRepository, SignatureRepository>();
+
 
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<ContractService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<SignatureService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<AuthService>();

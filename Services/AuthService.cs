@@ -36,7 +36,7 @@ public class AuthService
             return null!;
         }
 
-        var passwordResult = _passwordHasher.VerifyHashedPassword(
+        PasswordVerificationResult passwordResult = _passwordHasher.VerifyHashedPassword(
             user,
             user.PasswordHash,
             request.Password
@@ -47,7 +47,7 @@ public class AuthService
             return null!;
         }
 
-        var token = _jwtService.GenerateToken(user);
+        string? token = _jwtService.GenerateToken(user);
 
         return new LoginResponseDTO(token);
     }

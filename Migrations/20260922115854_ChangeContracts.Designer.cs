@@ -4,6 +4,7 @@ using ContractMaster.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContractMasters.Migrations
 {
     [DbContext(typeof(ContractMasterContext))]
-    partial class ContractMasterContextModelSnapshot : ModelSnapshot
+    [Migration("20260922115854_ChangeContracts")]
+    partial class ChangeContracts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,8 +33,8 @@ namespace ContractMasters.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApprovalStatus")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly?>("ApprovedAt")
                         .HasColumnType("date");
@@ -71,11 +74,10 @@ namespace ContractMasters.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ContracType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContractType")
                         .HasColumnType("int");
 
                     b.Property<string>("CounterPartyEmail")
@@ -98,9 +100,8 @@ namespace ContractMasters.Migrations
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("Version")
                         .HasColumnType("int");

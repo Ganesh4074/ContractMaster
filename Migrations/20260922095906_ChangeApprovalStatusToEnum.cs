@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ContractMasters.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class ChangeApprovalStatusToEnum : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -74,7 +74,7 @@ namespace ContractMasters.Migrations
                     ContractId = table.Column<int>(type: "int", nullable: false),
                     ApproverId = table.Column<int>(type: "int", nullable: false),
                     ApproverType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApprovalStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApprovalStatus = table.Column<int>(type: "int", nullable: false),
                     ApprovedAt = table.Column<DateOnly>(type: "date", nullable: true),
                     RejectedAt = table.Column<DateOnly>(type: "date", nullable: true)
                 },

@@ -18,6 +18,7 @@ public class ContractController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Create(NewContractDTO newContract)
     {
         await _contractService.CreateContract(newContract);
@@ -25,12 +26,14 @@ public class ContractController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _contractService.GetContracts());
     }
 
     [HttpDelete]
+    [Authorize(Roles ="Admin")]
     public async Task<IActionResult> DeleteById(int id)
     {
         await _contractService.DeleteById(id);

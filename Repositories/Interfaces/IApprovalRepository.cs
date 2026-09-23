@@ -11,4 +11,6 @@ public interface IApprovalRepository
     Task<List<Approvals>> GetAllAsync();
 
     Task UpdateAsync(Approvals approval);
+    Task<List<Approvals>> GetByContractAndVersionAsync(int contractId, int version);
+    Task AddRangeAsync(List<Approvals> approvals);
 }

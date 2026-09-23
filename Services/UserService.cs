@@ -32,7 +32,7 @@ public class UserService
 
         user.PasswordHash = _passwordHasher.HashPassword(
             user,
-            newUser.PasswordHash
+            newUser.Password
         );
 
         await _repository.AddAsync(user);

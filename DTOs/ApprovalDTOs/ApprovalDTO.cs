@@ -1,3 +1,5 @@
+using ContractMaster.Models.Enums;
+
 namespace ContractMaster.DTOs;
 
 public record ApprovalDTO(
@@ -6,8 +8,8 @@ public record ApprovalDTO(
     int Sequence,
     int ContractId,
     int ApproverId,
-    string? ApproverType,
-    string? ApprovalStatus,
-    DateOnly ApprovedAt,
-    DateOnly RejectedAt
+    ApproverType ApproverType,
+    ApprovalStatus ApprovalStatus,
+    DateOnly? ApprovedAt,
+    DateOnly? RejectedAt
 );
