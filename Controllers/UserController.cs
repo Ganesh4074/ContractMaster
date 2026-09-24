@@ -1,3 +1,4 @@
+using ContractMaster.Constants;
 using ContractMaster.DTOs;
 using ContractMaster.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -17,8 +18,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize/*(Roles = "Admin")*/]
-    [AllowAnonymous]
+    [Authorize(Roles = RoleNames.Admin)]
     public async Task<IActionResult> Create(NewUserDto newUser)
     {
         await _userService.CreateUser(newUser);
@@ -26,16 +26,10 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize/*(Roles = "Admin")*/]
+    [Authorize(Roles = RoleNames.Admin)]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _userService.GetUsers());
     }
 
-    [HttpGet("Approvals/pending")]
-    [Authorize]
-    public async Task<IActionResult> GetPendingApprovals()
-    {
-        return Ok(await _userService.GetPendingApprovals());
-    }
 }

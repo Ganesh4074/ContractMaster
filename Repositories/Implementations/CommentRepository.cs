@@ -16,9 +16,9 @@ public class CommentRepository : ICommentRepository
 
     public async Task<List<Comment>> GetByContractIdVersionAsync(int contractId, int version)
     {
-        return await _db.Comments
-            .Where(comment => comment.ContractId == contractId && comment.Version==version)
-            .ToListAsync();
+        return await _db.Comments.Where(comment =>
+                comment.ContractId == contractId &&
+                comment.Version == version).ToListAsync();
     }
 
     public async Task AddAsync(Comment comment)

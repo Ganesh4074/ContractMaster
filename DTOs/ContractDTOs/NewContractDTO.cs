@@ -11,6 +11,5 @@ public record NewContractDTO(
     DateOnly EndDate,
     string CounterPartyName,
     string CounterPartyEmail,
-    int CreatedById,
     DateOnly CreatedAt
     );

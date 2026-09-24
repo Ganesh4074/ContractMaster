@@ -50,4 +50,9 @@ public class SignatureRepository : ISignatureRepository
         return await _db.Signatures.Where(s =>
             s.ContractId == contractId && s.Version == version).ToListAsync();
     }
+    public async Task AddAsync(Signature signature)
+    {
+        await _db.Signatures.AddAsync(signature);
+        await _db.SaveChangesAsync();
+    }
 }

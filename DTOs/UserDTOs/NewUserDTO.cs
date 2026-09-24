@@ -1,8 +1,9 @@
 namespace ContractMaster.DTOs;
+
 public record NewUserDto(
     string Name,
     int DepartmentId,
-    string Role,
+    int RoleId,
     string EMail,
     string Password
 );

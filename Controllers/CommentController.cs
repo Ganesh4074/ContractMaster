@@ -31,14 +31,7 @@ public class CommentsController : ControllerBase
     public async Task<IActionResult> CreateComment(
         NewCommentDTO newComment)
     {
-        var userIdClaim = User.FindFirstValue(
-            ClaimTypes.NameIdentifier);
-
-        if (!int.TryParse(userIdClaim, out var userId))
-        {
-            throw new UnauthorizedAccessException(
-                "User ID claim is missing.");
-        }
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         await _service.CreateComment(newComment, userId);
 

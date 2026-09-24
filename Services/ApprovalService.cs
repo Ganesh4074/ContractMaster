@@ -9,12 +9,10 @@ namespace ContractMaster.Services;
 public class ApprovalService
 {
     private readonly IApprovalRepository _repository;
-    private readonly SignatureService _signatureService;
 
-    public ApprovalService(IApprovalRepository repository, SignatureService signatureService)
+    public ApprovalService(IApprovalRepository repository)
     {
         _repository = repository;
-        _signatureService = signatureService;
     }
 
     public async Task<GetApprovalDTO?> GetApprovalById(int id)
@@ -46,9 +44,9 @@ public class ApprovalService
             Version = newApproval.Version,
             Sequence = newApproval.Sequence,
             ContractId = newApproval.ContractId,
-            ApproverId = newApproval.ApproverId,
+            ApproverId = 0,
             ApproverType = newApproval.ApproverType,
-            ApprovalStatus = newApproval.ApprovalStatus
+            ApprovalStatus = 0
         };
 
         await _repository.AddAsync(approval);
@@ -71,7 +69,7 @@ public class ApprovalService
         )).ToList();
     }
 
-    public async Task<GetApprovalDTO?> UpdateApproval(int id, UpdateApprovalDTO update, string userRole)
+    public async Task<GetApprovalDTO?> UpdateApproval(int id, UpdateApprovalDTO update, int userId, string userRole)
     {
         var approval = await _repository.GetByIdAsync(id);
 
@@ -79,71 +77,60 @@ public class ApprovalService
         {
             return null;
         }
-        //To check if the Current user is allowed to approve a particular record
+
         var isAuthorized = approval.ApproverType switch
         {
-            ApproverType.Legal => userRole == "Legal Approver",
-            ApproverType.Internal => userRole == "Internal Approver",
-            ApproverType.External => userRole == "External Approver",
+            ApproverType.Legal => userRole == "LegalApprover",
+            ApproverType.Internal => userRole == "InternalApprover",
+            ApproverType.External => userRole == "ExternalApprover",
             _ => false
         };
 
         if (!isAuthorized)
         {
-            throw new BusinessRuleException("You are not authorized to approve this request.");
+            throw new BusinessRuleException(
+                "You are not authorized to approve this request.");
+        }
+        if (approval.ApprovalStatus != ApprovalStatus.Pending)
+        {
+            throw new BusinessRuleException("This approval has already been processed.");
         }
 
         if (update.ApprovalStatus == ApprovalStatus.Approved)
         {
             if (approval.Sequence > 1)
             {
-                var approvals = await _repository.GetByContractAndVersionAsync(approval.ContractId, approval.Version);
+                var approvals =
+                    await _repository.GetByContractAndVersionAsync(
+                        approval.ContractId,
+                        approval.Version);
 
-                var previousApproval = approvals.FirstOrDefault(a => 
-                    a.Sequence == approval.Sequence - 1);
+                var previousApproval = approvals.FirstOrDefault(item => item.Sequence == approval.Sequence - 1);
 
                 if (previousApproval is null || previousApproval.ApprovalStatus != ApprovalStatus.Approved)
                 {
-                    throw new BusinessRuleException(
-                        "Previous approval is still pending.");
+                    throw new BusinessRuleException("Previous approval is still pending.");
                 }
             }
 
             approval.ApprovedAt = update.Date;
+            approval.ApproverId = userId;
             approval.RejectedAt = null;
         }
         else if (update.ApprovalStatus == ApprovalStatus.Rejected)
         {
             approval.RejectedAt = update.Date;
+            approval.ApproverId = userId;
             approval.ApprovedAt = null;
         }
         else
         {
-            throw new BusinessRuleException(
-                "Approval status not allowed.");
+            throw new BusinessRuleException("Approval status not allowed.");
         }
 
         approval.ApprovalStatus = update.ApprovalStatus;
 
         await _repository.UpdateAsync(approval);
-
-        if (update.ApprovalStatus == ApprovalStatus.Approved)
-        {
-            var approvals =
-                await _repository.GetByContractAndVersionAsync(
-                    approval.ContractId,
-                    approval.Version);
-
-            var allApproved = approvals.All(
-                a => a.ApprovalStatus == ApprovalStatus.Approved);
-
-            if (allApproved)
-            {
-                await _signatureService.CreateSignatures(
-                    approval.ContractId,
-                    approval.Version);
-            }
-        }
 
         return new GetApprovalDTO(
             approval.Id,

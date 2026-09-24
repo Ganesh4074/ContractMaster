@@ -11,39 +11,42 @@ public class AuthService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly JwtService _jwtService;
 
-    public AuthService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher, JwtService jwtService)
+    public AuthService(
+        IUserRepository userRepository,
+        IPasswordHasher<User> passwordHasher,
+        JwtService jwtService)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
     }
 
-    public async Task<LoginResponseDTO> Login(LoginRequestDTO request)
+    public async Task<LoginResponseDTO?> Login(LoginRequestDTO request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
-        { 
-            return null!;
+        if (string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Password))
+        {
+            return null;
         }
 
         var user = await _userRepository.GetByEmailAsync(request.Email);
 
         if (user is null)
         {
-            return null!;
+            return null;
         }
 
-        PasswordVerificationResult passwordResult= _passwordHasher.VerifyHashedPassword(
+        var passwordResult = _passwordHasher.VerifyHashedPassword(
             user,
             user.PasswordHash,
-            request.Password
-        );
+            request.Password);
 
         if (passwordResult == PasswordVerificationResult.Failed)
         {
-            return null!;
+            return null;
         }
 
-        string? token = _jwtService.GenerateToken(user);
+        var token = _jwtService.GenerateToken(user);
 
         return new LoginResponseDTO(token);
     }

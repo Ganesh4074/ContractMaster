@@ -27,8 +27,7 @@ public class ContractRepository : IContractRepository
 
     public async Task<Contract?> GetByIdAsync(int id)
     {
-        return await _db.Contracts
-            .FirstOrDefaultAsync(contract => contract.Id == id);
+        return await _db.Contracts.FirstOrDefaultAsync(contract => contract.Id == id);
     }
 
     public async Task DeleteAsync(Contract contract)
@@ -47,8 +46,7 @@ public class ContractRepository : IContractRepository
     }
     public async Task<Contract?> GetByContractAndVersionAsync(int contractId, int version)
     {
-        return await _db.Contracts
-            .FirstOrDefaultAsync(contract =>
+        return await _db.Contracts.FirstOrDefaultAsync(contract =>
                 contract.ContractId == contractId &&
                 contract.Version == version);
     }

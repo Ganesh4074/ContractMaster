@@ -9,10 +9,7 @@ public static class DataExtention
     public static void MigrateDB(this WebApplication app)
     {
         using var Scope = app.Services.CreateScope();
-
-        var DbContext = Scope.ServiceProvider
-            .GetRequiredService<ContractMasterContext>();
-
+        var DbContext = Scope.ServiceProvider.GetRequiredService<ContractMasterContext>();
         DbContext.Database.Migrate();
     }
 

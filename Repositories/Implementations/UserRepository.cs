@@ -23,20 +23,17 @@ public class UserRepository : IUserRepository
 
     public async Task<List<User>> GetAllAsync()
     {
-        return await _db.Users.ToListAsync();
+        return await _db.Users.Include(user => user.Role).ToListAsync();
     }
 
     public async Task<List<Approvals>> GetPendingApprovalsAsync()
     {
-        return await _db.Approvals
-            .Where(approval =>
-                approval.ApprovalStatus == ApprovalStatus.Pending)
-            .ToListAsync();
+        return await _db.Approvals.Where(approval =>
+            approval.ApprovalStatus == ApprovalStatus.Pending).ToListAsync();
     }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _db.Users
-            .FirstOrDefaultAsync(user => user.EMail == email);
+        return await _db.Users.Include(user => user.Role).FirstOrDefaultAsync(user => user.EMail == email);
     }
 }

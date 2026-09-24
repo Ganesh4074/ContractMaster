@@ -7,6 +7,7 @@ namespace ContractMaster.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class ApprovalsController : ControllerBase
 {
     private readonly ApprovalService _approvalService;
@@ -23,14 +24,12 @@ public class ApprovalsController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _approvalService.GetApprovals());
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles ="Administrator,Approver")]
     public async Task<IActionResult> GetApprovalById(int id)
     {
         var approval=await _approvalService.GetApprovalById(id);
@@ -42,19 +41,12 @@ public class ApprovalsController : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Roles = "Approver,Administrator,External Approver")]
     public async Task<IActionResult> Update(int id, UpdateApprovalDTO update)
     {
         string? userRole=User.FindFirstValue(ClaimTypes.Role);
-        var approval = await _approvalService.UpdateApproval(id, update, userRole);
+        int userId=int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var approval = await _approvalService.UpdateApproval(id, update,userId, userRole!);
         return approval is null ? NotFound() : Ok(approval);
     }
 
-    [HttpGet("Get-Error")]
-    public async Task<IActionResult> Error()
-    {
-        var k=100;
-        var z=0;
-        return Ok(k/z);
-    }
 }

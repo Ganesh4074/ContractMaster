@@ -26,8 +26,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateDepartment(
-        NewDepartmentDTO newDepartment)
+    public async Task<IActionResult> CreateDepartment(NewDepartmentDTO newDepartment)
     {
         await _service.CreateDepartment(newDepartment);
 

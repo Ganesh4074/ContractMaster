@@ -1,3 +1,4 @@
+using ContractMaster.Constants;
 using ContractMaster.DTOs;
 using ContractMaster.Exceptions;
 using ContractMaster.Models;
@@ -10,52 +11,18 @@ public class SignatureService
 {
     private readonly ISignatureRepository _repository;
     private readonly ContractService _contractService;
+
     public SignatureService(ISignatureRepository repository, ContractService contractService)
     {
         _repository = repository;
-        _contractService=contractService;
-    }
-
-    public async Task CreateSignatures(int contractId, int version)
-    {
-        //Check if same contract version exists
-        var exists = await _repository.ExistsAsync(contractId, version);
-
-        if (exists)
-        {
-            return;
-        }
-
-        var signatures = new List<Signature>
-        {
-            new Signature
-            {
-                ContractId = contractId,
-                Version = version,
-                SignatoryId = 0,
-                SignatureType = SignatureType.Internal,
-                SignatureStatus = SignatureStatus.NotSigned
-            },
-
-            new Signature
-            {
-                ContractId = contractId,
-                Version = version,
-                SignatoryId = 0,
-                SignatureType = SignatureType.External,
-                SignatureStatus = SignatureStatus.NotSigned
-            }
-        };
-
-        await _repository.AddRangeAsync(signatures);
+        _contractService = contractService;
     }
 
     public async Task<List<GetSignatureDTO>> GetSignatures()
     {
         var signatures = await _repository.GetAllAsync();
 
-        return signatures.Select(signature =>
-            new GetSignatureDTO(
+        return signatures.Select(signature => new GetSignatureDTO(
                 signature.Id,
                 signature.ContractId,
                 signature.Version,
@@ -66,54 +33,93 @@ public class SignatureService
         ).ToList();
     }
 
-    public async Task<GetSignatureDTO> UpdateSignature(
-    int id,
-    UpdateSignatureDTO update,
-    int userId)
-{
-    var signature = await _repository.GetByIdAsync(id);
-
-    if (signature is null)
+    public async Task<GetSignatureDTO?> UpdateSignature(int id, UpdateSignatureDTO update, int userId, string userRole)
     {
-        return null!;
-    }
+        var signature = await _repository.GetByIdAsync(id);
 
-    if (signature.SignatureStatus == SignatureStatus.Signed)
-    {
-        throw new BusinessRuleException(
-            "Signature is already signed.");
-    }
+        if (signature is null)
+        {
+            return null;
+        }
 
-    if (update.SignatureStatus != SignatureStatus.Signed)
-    {
-        throw new BusinessRuleException(
-            "Signature can only be marked as signed.");
-    }
+        if (signature.SignatureStatus == SignatureStatus.Signed)
+        {
+            throw new BusinessRuleException(
+                "Signature is already signed.");
+        }
 
-    signature.SignatureStatus = SignatureStatus.Signed;
-    signature.SignatoryId = userId;
+        var isAuthorized = signature.SignatureType switch
+        {
+            SignatureType.Internal =>
+                userRole == RoleNames.InternalSignatory,
 
-    await _repository.UpdateAsync(signature);
+            SignatureType.External =>
+                userRole == RoleNames.ExternalSignatory,
 
-    var signatures = await _repository.GetByContractAndVersionAsync(
+            _ => false
+        };
+
+        if (!isAuthorized)
+        {
+            throw new BusinessRuleException(
+                "You are not authorized to sign this signature.");
+        }
+
+        if (update.SignatureStatus != SignatureStatus.Signed)
+        {
+            throw new BusinessRuleException(
+                "Signature can only be marked as signed.");
+        }
+
+        signature.SignatureStatus = SignatureStatus.Signed;
+        signature.SignatoryId = userId;
+
+        await _repository.UpdateAsync(signature);
+
+        var signatures =
+            await _repository.GetByContractAndVersionAsync(
+                signature.ContractId,
+                signature.Version);
+
+        var allSigned = signatures.Count > 0 && signatures.All(item => item.SignatureStatus == SignatureStatus.Signed);
+
+        if (allSigned)
+        {
+            await _contractService.UpdateStatus(
+                signature.ContractId,
+                signature.Version,
+                ContractStatus.Active);
+        }
+
+        return new GetSignatureDTO(
+            signature.Id,
             signature.ContractId,
-            signature.Version);
-
-    var allSigned = signatures.All(
-        s => s.SignatureStatus == SignatureStatus.Signed);
-
-    if (allSigned)
-    {
-        await _contractService.UpdateStatus(signature.ContractId, signature.Version, ContractStatus.Active);
+            signature.Version,
+            signature.SignatoryId,
+            signature.SignatureType,
+            signature.SignatureStatus
+        );
     }
+    public async Task<GetSignatureDTO> CreateSignature(NewSignatureDTO newSignature)
+    {
+        var signature = new Signature
+        {
+            ContractId = newSignature.ContractId,
+            Version = newSignature.Version,
+            SignatoryId = 0,
+            SignatureType = newSignature.SignatureType,
+            SignatureStatus = SignatureStatus.NotSigned
+        };
 
-    return new GetSignatureDTO(
-        signature.Id,
-        signature.ContractId,
-        signature.Version,
-        signature.SignatoryId,
-        signature.SignatureType,
-        signature.SignatureStatus
-    );
-}
+        await _repository.AddAsync(signature);
+
+        return new GetSignatureDTO(
+            signature.Id,
+            signature.ContractId,
+            signature.Version,
+            signature.SignatoryId,
+            signature.SignatureType,
+            signature.SignatureStatus
+        );
+    }
 }

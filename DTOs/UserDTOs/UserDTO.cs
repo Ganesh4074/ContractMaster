@@ -4,6 +4,7 @@ public record UserDto(
     int Id,
     string Name,
     int DepartmentId,
-    string Role,
+    int RoleId,
+    string RoleName,
     string Email
-    );
+);

@@ -33,9 +33,10 @@ builder.Services.AddScoped<IApprovalRepository, ApprovalRepository>();
 builder.Services.AddScoped<ISignatureRepository, SignatureRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 
-
+builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<ContractService>();
 builder.Services.AddScoped<UserService>();

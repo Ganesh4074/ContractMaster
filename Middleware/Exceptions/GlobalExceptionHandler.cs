@@ -24,24 +24,22 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 problemDetails.Title = "Not Found";
                 problemDetails.Detail = exception.Message;
                 break;
-
             case ArgumentException:
                 problemDetails.Status = (int)HttpStatusCode.BadRequest;
                 problemDetails.Title = "Bad Request";
                 problemDetails.Detail = exception.Message;
                 break;
-
             case InvalidOperationException:
                 problemDetails.Status = (int)HttpStatusCode.Conflict;
                 problemDetails.Title = "Conflict";
                 problemDetails.Detail = exception.Message;
                 break;
+            //custom
             case BusinessRuleException:
                 problemDetails.Status = (int)HttpStatusCode.BadRequest;
                 problemDetails.Title = "Business Rule Violation";
                 problemDetails.Detail = exception.Message;
                 break;
-
             default:
                 problemDetails.Status = (int)HttpStatusCode.InternalServerError;
                 problemDetails.Title = "Internal Server Error";
@@ -51,10 +49,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
 
-        await httpContext.Response.WriteAsJsonAsync(
-            problemDetails,
-            cancellationToken);
-
+        await httpContext.Response.WriteAsJsonAsync(problemDetails,cancellationToken);
         return true;
     }
 }

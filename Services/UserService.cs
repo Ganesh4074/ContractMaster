@@ -1,5 +1,4 @@
 using ContractMaster.DTOs;
-using ContractMaster.DTOs.ApprovalDTOs;
 using ContractMaster.Exceptions;
 using ContractMaster.Models;
 using ContractMaster.Repositories.Interfaces;
@@ -11,34 +10,50 @@ public class UserService
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IRoleRepository _roleRepository;
 
     public UserService(
         IUserRepository repository,
-        IPasswordHasher<User> passwordHasher)
+        IPasswordHasher<User> passwordHasher,
+        IRoleRepository roleRepository)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
+        _roleRepository = roleRepository;
     }
 
     public async Task CreateUser(NewUserDto newUser)
     {
-        if(await _repository.GetByEmailAsync(newUser.EMail)!=null)
+        var existingUser = await _repository.GetByEmailAsync(
+            newUser.EMail);
+
+        if (existingUser is not null)
         {
-            throw new BusinessRuleException("user with email already exists");
+            throw new BusinessRuleException(
+                "User with this email already exists.");
         }
+
+        var role = await _roleRepository.GetByIdAsync(
+            newUser.RoleId);
+
+        if (role is null)
+        {
+            throw new BusinessRuleException(
+                "Invalid role.");
+        }
+
         User user = new()
         {
             Name = newUser.Name,
             DepartmentId = newUser.DepartmentId,
-            Role = newUser.Role,
+            RoleId = newUser.RoleId,
             EMail = newUser.EMail,
             PasswordHash = string.Empty
         };
 
         user.PasswordHash = _passwordHasher.HashPassword(
             user,
-            newUser.Password
-        );
+            newUser.Password);
 
         await _repository.AddAsync(user);
     }
@@ -51,20 +66,9 @@ public class UserService
             user.Id,
             user.Name,
             user.DepartmentId,
-            user.Role,
+            user.RoleId,
+            user.Role.Name,
             user.EMail
-        )).ToList();
-    }
-
-    public async Task<List<PendingApprovalsDTO>> GetPendingApprovals()
-    {
-        var approvals = await _repository.GetPendingApprovalsAsync();
-
-        return approvals.Select(approval => new PendingApprovalsDTO(
-            approval.ContractId,
-            approval.Version,
-            approval.ApproverId,
-            approval.Sequence
         )).ToList();
     }
 }

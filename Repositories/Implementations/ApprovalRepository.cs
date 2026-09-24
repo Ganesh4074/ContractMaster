@@ -37,11 +37,9 @@ public class ApprovalRepository : IApprovalRepository
     }
     public async Task<List<Approvals>> GetByContractAndVersionAsync(int contractId, int version)
     {
-        return await _db.Approvals
-            .Where(a =>
+        return await _db.Approvals.Where(a =>
                 a.ContractId == contractId &&
-                a.Version == version)
-            .ToListAsync();
+                a.Version == version).ToListAsync();
     }
     public async Task AddRangeAsync(List<Approvals> approvals)
     {

@@ -31,8 +31,7 @@ public class JwtService
             ),
             new Claim(
                 ClaimTypes.Role,
-                user.Role.ToString()
-            )
+                user.Role.Name)
         };
 
         var key = new SymmetricSecurityKey(

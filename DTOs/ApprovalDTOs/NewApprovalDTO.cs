@@ -6,7 +6,5 @@ public record NewApprovalDTO(
     int Version,
     int Sequence,
     int ContractId,
-    int ApproverId,
-    ApproverType ApproverType,
-    ApprovalStatus ApprovalStatus
+    ApproverType ApproverType
 );

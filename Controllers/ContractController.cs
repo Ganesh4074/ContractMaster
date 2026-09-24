@@ -1,8 +1,9 @@
+using ContractMaster.Constants;
 using ContractMaster.DTOs;
 using ContractMaster.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Security.Claims;
 namespace ContractMaster.Controllers;
 
 [ApiController]
@@ -18,10 +19,12 @@ public class ContractController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles =RoleNames.Sales)]
     public async Task<IActionResult> Create(NewContractDTO newContract)
     {
-        await _contractService.CreateContract(newContract);
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        
+        await _contractService.CreateContract(newContract, userId);
         return Ok();
     }
 
@@ -33,7 +36,7 @@ public class ContractController : ControllerBase
     }
 
     [HttpDelete]
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles =RoleNames.Admin)]
     public async Task<IActionResult> DeleteById(int id)
     {
         await _contractService.DeleteById(id);
