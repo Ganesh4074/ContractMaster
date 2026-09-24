@@ -38,8 +38,6 @@ public class SignaturesController : ControllerBase
                 id,
                 update,userId);
 
-        return signature is null
-            ? NotFound()
-            : Ok(signature);
+        return signature is null?NotFound():Ok(signature);
     }
 }

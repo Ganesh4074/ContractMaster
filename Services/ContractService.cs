@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ContractMaster.DTOs;
 using ContractMaster.Exceptions;
 using ContractMaster.Models;
@@ -47,8 +48,8 @@ public class ContractService
         {
             Version = contract.Version,
             Sequence = 1,
-            ContractId = contract.Id,
-            ApproverId = 1,
+            ContractId = contract.ContractId,
+            ApproverId = 0,
             ApproverType = ApproverType.Legal,
             ApprovalStatus = ApprovalStatus.Pending
         },
@@ -56,8 +57,8 @@ public class ContractService
         {
             Version = contract.Version,
             Sequence = 2,
-            ContractId = contract.Id,
-            ApproverId = 1,
+            ContractId = contract.ContractId,
+            ApproverId = 0,
             ApproverType = ApproverType.Internal,
             ApprovalStatus = ApprovalStatus.Pending
         },
@@ -65,8 +66,8 @@ public class ContractService
         {
             Version = contract.Version,
             Sequence = 3,
-            ContractId = contract.Id,
-            ApproverId = 1,
+            ContractId = contract.ContractId,
+            ApproverId = 0,
             ApproverType = ApproverType.External,
             ApprovalStatus = ApprovalStatus.Pending
         }

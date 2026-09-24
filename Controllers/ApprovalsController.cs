@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ContractMaster.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using ContractMaster.Services;
+using System.Security.Claims;
 namespace ContractMaster.Controllers;
 
 [ApiController]
@@ -41,10 +42,11 @@ public class ApprovalsController : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Roles = "Approver,Administrator")]
+    [Authorize(Roles = "Approver,Administrator,External Approver")]
     public async Task<IActionResult> Update(int id, UpdateApprovalDTO update)
     {
-        var approval = await _approvalService.UpdateApproval(id, update);
+        string? userRole=User.FindFirstValue(ClaimTypes.Role);
+        var approval = await _approvalService.UpdateApproval(id, update, userRole);
         return approval is null ? NotFound() : Ok(approval);
     }
 
