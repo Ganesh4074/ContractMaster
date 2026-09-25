@@ -88,8 +88,7 @@ public class ApprovalService
 
         if (!isAuthorized)
         {
-            throw new BusinessRuleException(
-                "You are not authorized to approve this request.");
+            throw new BusinessRuleException("You are not authorized to approve this request.");
         }
         if (approval.ApprovalStatus != ApprovalStatus.Pending)
         {
@@ -100,10 +99,7 @@ public class ApprovalService
         {
             if (approval.Sequence > 1)
             {
-                var approvals =
-                    await _repository.GetByContractAndVersionAsync(
-                        approval.ContractId,
-                        approval.Version);
+                var approvals =await _repository.GetByContractAndVersionAsync(approval.ContractId, approval.Version);
 
                 var previousApproval = approvals.FirstOrDefault(item => item.Sequence == approval.Sequence - 1);
 

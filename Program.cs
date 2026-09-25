@@ -80,10 +80,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer",
-        new Microsoft.OpenApi.OpenApiSecurityScheme
+        new OpenApiSecurityScheme
         {
             Name = "Authorization",
-            Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+            Type = SecuritySchemeType.Http,
             Scheme = "bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
@@ -108,12 +108,12 @@ app.UseExceptionHandler();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.MigrateDB();
 
 app.Run();
+
+

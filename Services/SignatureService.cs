@@ -36,18 +36,17 @@ public class SignatureService
     public async Task<GetSignatureDTO?> UpdateSignature(int id, UpdateSignatureDTO update, int userId, string userRole)
     {
         var signature = await _repository.GetByIdAsync(id);
-
+        //check if signature exists
         if (signature is null)
         {
             return null;
         }
-
+        //Check if Signature is already signed
         if (signature.SignatureStatus == SignatureStatus.Signed)
         {
-            throw new BusinessRuleException(
-                "Signature is already signed.");
+            throw new BusinessRuleException("Signature is already signed.");
         }
-
+        //Check if it is the correct Signatory for the signature
         var isAuthorized = signature.SignatureType switch
         {
             SignatureType.Internal =>
@@ -65,19 +64,13 @@ public class SignatureService
                 "You are not authorized to sign this signature.");
         }
 
-        if (update.SignatureStatus != SignatureStatus.Signed)
-        {
-            throw new BusinessRuleException(
-                "Signature can only be marked as signed.");
-        }
 
         signature.SignatureStatus = SignatureStatus.Signed;
         signature.SignatoryId = userId;
 
         await _repository.UpdateAsync(signature);
 
-        var signatures =
-            await _repository.GetByContractAndVersionAsync(
+        var signatures = await _repository.GetByContractAndVersionAsync(
                 signature.ContractId,
                 signature.Version);
 

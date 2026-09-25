@@ -12,10 +12,7 @@ public class UserService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IRoleRepository _roleRepository;
 
-    public UserService(
-        IUserRepository repository,
-        IPasswordHasher<User> passwordHasher,
-        IRoleRepository roleRepository)
+    public UserService(IUserRepository repository, IPasswordHasher<User> passwordHasher, IRoleRepository roleRepository)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
@@ -29,17 +26,14 @@ public class UserService
 
         if (existingUser is not null)
         {
-            throw new BusinessRuleException(
-                "User with this email already exists.");
+            throw new BusinessRuleException("User with this email already exists.");
         }
 
-        var role = await _roleRepository.GetByIdAsync(
-            newUser.RoleId);
+        var role = await _roleRepository.GetByIdAsync(newUser.RoleId);
 
         if (role is null)
         {
-            throw new BusinessRuleException(
-                "Invalid role.");
+            throw new BusinessRuleException("Invalid role.");
         }
 
         User user = new()
@@ -51,9 +45,7 @@ public class UserService
             PasswordHash = string.Empty
         };
 
-        user.PasswordHash = _passwordHasher.HashPassword(
-            user,
-            newUser.Password);
+        user.PasswordHash = _passwordHasher.HashPassword(user, newUser.Password);
 
         await _repository.AddAsync(user);
     }

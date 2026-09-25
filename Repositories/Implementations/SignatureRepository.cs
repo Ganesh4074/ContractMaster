@@ -13,14 +13,10 @@ public class SignatureRepository : ISignatureRepository
     {
         _db = db;
     }
-
-    public async Task<bool> ExistsAsync(
-        int contractId,
-        int version)
+    public async Task<bool> ExistsAsync(int contractId, int version)
     {
         return await _db.Signatures.AnyAsync(s =>
-            s.ContractId == contractId &&
-            s.Version == version);
+            s.ContractId == contractId && s.Version == version);
     }
 
     public async Task AddRangeAsync(

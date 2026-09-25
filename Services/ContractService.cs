@@ -9,37 +9,37 @@ namespace ContractMaster.Services;
 public class ContractService
 {
     private readonly IContractRepository _repository;
-    public ContractService(IContractRepository repository, IApprovalRepository approvalRepository)
+    public ContractService(IContractRepository repository)
     {
         _repository = repository;
     }
 
     public async Task CreateContract(NewContractDTO newContract, int userId)
-{
-    var exists = await _repository.ExistsAsync(newContract.ContractId, newContract.Version);
-
-    if (exists)
     {
-        throw new InvalidOperationException("Contract already exists for this version.");
+        var exists = await _repository.ExistsAsync(newContract.ContractId, newContract.Version);
+
+        if (exists)
+        {
+            throw new InvalidOperationException("Contract already exists for this version.");
+        }
+
+        Contract contract = new()
+        {
+            ContractId = newContract.ContractId,
+            Version = newContract.Version,
+            ContractType = newContract.ContractType,
+            Status = newContract.Status,
+            StartDate = newContract.StartDate,
+            EndDate = newContract.EndDate,
+            CounterPartyName = newContract.CounterPartyName,
+            CounterPartyEmail = newContract.CounterPartyEmail,
+            CreatedById = userId,
+            CreatedAt = newContract.CreatedAt
+        };
+
+        await _repository.AddAsync(contract);
+
     }
-
-    Contract contract = new()
-    {
-        ContractId = newContract.ContractId,
-        Version = newContract.Version,
-        ContractType = newContract.ContractType,
-        Status = newContract.Status,
-        StartDate = newContract.StartDate,
-        EndDate = newContract.EndDate,
-        CounterPartyName = newContract.CounterPartyName,
-        CounterPartyEmail = newContract.CounterPartyEmail,
-        CreatedById = userId,
-        CreatedAt = newContract.CreatedAt
-    };
-
-    await _repository.AddAsync(contract);
-
-}
 
     public async Task<List<ContractDTO>> GetContracts()
     {
@@ -76,8 +76,7 @@ public class ContractService
 
         if(contract is null)
         {
-            throw new BusinessRuleException(
-                "Contract not found.");
+            throw new BusinessRuleException("Contract not found.");
         }
 
         contract.Status = status;

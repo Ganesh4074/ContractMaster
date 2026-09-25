@@ -20,8 +20,7 @@ public class DepartmentService
         return departments
             .Select(department => new DepartmentDTO(
                 department.Id,
-                department.Name))
-            .ToList();
+                department.Name)).ToList();
     }
 
     public async Task CreateDepartment(NewDepartmentDTO newDepartment)
