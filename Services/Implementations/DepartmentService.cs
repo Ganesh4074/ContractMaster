@@ -4,7 +4,7 @@ using ContractMaster.Repositories.Interfaces;
 
 namespace ContractMaster.Services;
 
-public class DepartmentService
+public class DepartmentService:IDepartmentService
 {
     private readonly IDepartmentRepository _repository;
 

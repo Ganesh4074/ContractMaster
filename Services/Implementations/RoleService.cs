@@ -5,7 +5,7 @@ using ContractMaster.Repositories.Interfaces;
 
 namespace ContractMaster.Services;
 
-public class RoleService
+public class RoleService:IRoleService
 {
     private readonly IRoleRepository _repository;
 

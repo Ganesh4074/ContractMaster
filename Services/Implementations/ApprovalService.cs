@@ -3,10 +3,11 @@ using ContractMaster.Exceptions;
 using ContractMaster.Models;
 using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
+using ContractMaster.Services.Interfaces;
 
 namespace ContractMaster.Services;
 
-public class ApprovalService
+public class ApprovalService:IApprovalService
 {
     private readonly IApprovalRepository _repository;
 

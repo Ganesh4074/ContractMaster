@@ -1,11 +1,12 @@
 using ContractMaster.DTOs;
 using ContractMaster.Models;
 using ContractMaster.Repositories.Interfaces;
+using ContractMaster.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace ContractMaster.Services;
 
-public class AuthService
+public class AuthService:IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher<User> _passwordHasher;

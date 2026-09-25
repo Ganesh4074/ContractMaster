@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ContractMaster.Services;
 
-public class JwtService
+public class JwtService:IJwtService
 {
     private readonly JWTSettings _settings;
 

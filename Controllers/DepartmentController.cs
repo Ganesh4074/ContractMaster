@@ -10,9 +10,9 @@ namespace ContractMaster.Controllers;
 [Authorize]
 public class DepartmentsController : ControllerBase
 {
-    private readonly DepartmentService _service;
+    private readonly IDepartmentService _service;
 
-    public DepartmentsController(DepartmentService service)
+    public DepartmentsController(IDepartmentService service)
     {
         _service = service;
     }

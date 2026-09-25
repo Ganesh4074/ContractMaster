@@ -6,7 +6,7 @@ using ContractMaster.Repositories.Interfaces;
 
 namespace ContractMaster.Services;
 
-public class ContractService
+public class ContractService:IContractService
 {
     private readonly IContractRepository _repository;
     public ContractService(IContractRepository repository)

@@ -1,10 +1,11 @@
 using ContractMaster.DTOs;
 using ContractMaster.Models;
 using ContractMaster.Repositories.Interfaces;
+using ContractMaster.Services.Interfaces;
 
 namespace ContractMaster.Services;
 
-public class CommentService
+public class CommentService:ICommentService
 {
     private readonly ICommentRepository _repository;
 

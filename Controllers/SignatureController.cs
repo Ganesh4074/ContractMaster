@@ -10,9 +10,9 @@ namespace ContractMaster.Controllers;
 [Route("[controller]")]
 public class SignaturesController : ControllerBase
 {
-    private readonly SignatureService _signatureService;
+    private readonly ISignatureService _signatureService;
 
-    public SignaturesController(SignatureService signatureService)
+    public SignaturesController(ISignatureService signatureService)
     {
         _signatureService = signatureService;
     }

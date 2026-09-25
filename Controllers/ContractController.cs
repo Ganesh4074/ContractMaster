@@ -11,9 +11,9 @@ namespace ContractMaster.Controllers;
 [Authorize]
 public class ContractController : ControllerBase
 {
-    private readonly ContractService _contractService;
+    private readonly IContractService _contractService;
 
-    public ContractController(ContractService contractService)
+    public ContractController(IContractService contractService)
     {
         _contractService = contractService;
     }

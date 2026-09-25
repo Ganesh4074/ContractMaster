@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using ContractMaster.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,19 +37,19 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 
-builder.Services.AddScoped<RoleService>();
-builder.Services.AddScoped<ApprovalService>();
-builder.Services.AddScoped<ContractService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<SignatureService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IApprovalService, ApprovalService>();
+builder.Services.AddScoped<IContractService,ContractService>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<ISignatureService,SignatureService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<JwtService>();
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<CommentService>();
-builder.Services.AddScoped<ApprovalService>();
-builder.Services.AddScoped<ContractService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<DepartmentService>();
+builder.Services.AddScoped<IJwtService,JwtService>();
+builder.Services.AddScoped<IAuthService,AuthService>();
+builder.Services.AddScoped<ICommentService,CommentService>();
+builder.Services.AddScoped<IApprovalService,ApprovalService>();
+builder.Services.AddScoped<IContractService,ContractService>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IDepartmentService,DepartmentService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

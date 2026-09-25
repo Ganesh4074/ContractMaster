@@ -11,9 +11,9 @@ namespace ContractMaster.Controllers;
 [Authorize(Roles = RoleNames.Admin)]
 public class RolesController : ControllerBase
 {
-    private readonly RoleService _service;
+    private readonly IRoleService _service;
 
-    public RolesController(RoleService service)
+    public RolesController(IRoleService service)
     {
         _service = service;
     }

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using ContractMaster.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using ContractMaster.Services;
 using System.Security.Claims;
+using ContractMaster.Services.Interfaces;
 namespace ContractMaster.Controllers;
 
 [ApiController]
@@ -10,8 +10,8 @@ namespace ContractMaster.Controllers;
 [Authorize]
 public class ApprovalsController : ControllerBase
 {
-    private readonly ApprovalService _approvalService;
-    public ApprovalsController(ApprovalService approvalService)
+    private readonly IApprovalService _approvalService;
+    public ApprovalsController(IApprovalService approvalService)
     {
         _approvalService=approvalService;
     }

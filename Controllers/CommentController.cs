@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using ContractMaster.DTOs;
 using ContractMaster.Services;
+using ContractMaster.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +12,9 @@ namespace ContractMaster.Controllers;
 [Authorize]
 public class CommentsController : ControllerBase
 {
-    private readonly CommentService _service;
+    private readonly ICommentService _service;
 
-    public CommentsController(CommentService service)
+    public CommentsController(ICommentService service)
     {
         _service = service;
     }

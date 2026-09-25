@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ContractMaster.Services;
 
-public class UserService
+public class UserService:IUserService
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordHasher<User> _passwordHasher;

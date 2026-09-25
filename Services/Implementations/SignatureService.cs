@@ -7,7 +7,7 @@ using ContractMaster.Repositories.Interfaces;
 
 namespace ContractMaster.Services;
 
-public class SignatureService
+public class SignatureService:ISignatureService
 {
     private readonly ISignatureRepository _repository;
     private readonly ContractService _contractService;
