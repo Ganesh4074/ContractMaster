@@ -10,9 +10,9 @@ public class AuthService:IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher<User> _passwordHasher;
-    private readonly JwtService _jwtService;
+    private readonly IJwtService _jwtService;
 
-    public AuthService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher, JwtService jwtService)
+    public AuthService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher, IJwtService jwtService)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;

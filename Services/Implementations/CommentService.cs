@@ -2,6 +2,8 @@ using ContractMaster.DTOs;
 using ContractMaster.Models;
 using ContractMaster.Repositories.Interfaces;
 using ContractMaster.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace ContractMaster.Services;
 
@@ -14,7 +16,7 @@ public class CommentService:ICommentService
         _repository = repository;
     }
 
-    public async Task<List<CommentDTO>> GetComments(int contractId, int version)
+    public async Task<List<CommentDTO>> GetCommentsById(int contractId, int version)
     {
         var comments = await _repository.GetByContractIdVersionAsync(contractId, version);
 
@@ -39,5 +41,17 @@ public class CommentService:ICommentService
         };
 
         await _repository.AddAsync(comment);
+    }
+    public async Task<List<CommentDTO>> GetCommentsAsync()
+    {
+        var comments=await _repository.GetCommentsAsync();
+        return comments.Select(comment=>new CommentDTO(
+            comment.Id,
+            comment.ContractId,
+            comment.Version,
+            comment.UserId,
+            comment.CommentText,
+            comment.CreatedAt
+        )).ToList();
     }
 }

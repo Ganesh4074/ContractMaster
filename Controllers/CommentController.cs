@@ -23,19 +23,25 @@ public class CommentsController : ControllerBase
     public async Task<ActionResult<List<CommentDTO>>> GetComments(
         int contractId, int version)
     {
-        var comments = await _service.GetComments(contractId,version);
+        var comments = await _service.GetCommentsById(contractId,version);
 
         return Ok(comments);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateComment(
-        NewCommentDTO newComment)
+    public async Task<IActionResult> CreateComment(NewCommentDTO newComment)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         await _service.CreateComment(newComment, userId);
 
         return Ok();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetComments()
+    {
+        var comments=await _service.GetCommentsAsync();
+        return Ok(comments);
     }
 }

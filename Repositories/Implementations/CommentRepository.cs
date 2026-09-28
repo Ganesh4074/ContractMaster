@@ -26,4 +26,8 @@ public class CommentRepository : ICommentRepository
         await _db.Comments.AddAsync(comment);
         await _db.SaveChangesAsync();
     }
+    public async Task<List<Comment>> GetCommentsAsync()
+    {
+        return await _db.Comments.ToListAsync();
+    }
 }

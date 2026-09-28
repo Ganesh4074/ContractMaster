@@ -10,9 +10,9 @@ namespace ContractMaster.Services;
 public class SignatureService:ISignatureService
 {
     private readonly ISignatureRepository _repository;
-    private readonly ContractService _contractService;
+    private readonly IContractService _contractService;
 
-    public SignatureService(ISignatureRepository repository, ContractService contractService)
+    public SignatureService(ISignatureRepository repository, IContractService contractService)
     {
         _repository = repository;
         _contractService = contractService;
