@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using ContractMaster.Services.Interfaces;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 Env.Load();
@@ -20,14 +22,15 @@ builder.Services.AddValidation();
 
 builder.AddData();
 
-builder.Services.Configure<JWTSettings>(
-    builder.Configuration.GetSection("JwtConfig")
-);
+// builder.Services.Configure<JWTSettings>(
+//     builder.Configuration.GetSection("JwtConfig")
+// );
 
-var jwtSettings = builder.Configuration
-    .GetSection("JwtConfig")
-    .Get<JWTSettings>()
-    ?? throw new InvalidOperationException("Jwt configuration missing");
+// var jwtSettings = builder.Configuration
+//     .GetSection("JwtConfig")
+//     .Get<JWTSettings>()
+//     ?? throw new InvalidOperationException("Jwt configuration missing");
+
 
 builder.Services.AddScoped<IApprovalRepository, ApprovalRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
@@ -40,6 +43,7 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IApprovalService, ApprovalService>();
 builder.Services.AddScoped<IContractService,ContractService>();
 builder.Services.AddScoped<IUserService,UserService>();
@@ -52,56 +56,92 @@ builder.Services.AddScoped<IApprovalService,ApprovalService>();
 builder.Services.AddScoped<IContractService,ContractService>();
 builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<IDepartmentService,DepartmentService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
 
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(
+        jwtOptions =>
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
+            // JWT bearer configuration if you need any
+        },
+        identityOptions =>
+        {
+            identityOptions.Instance =
+                Environment.GetEnvironmentVariable("AZURE_INSTANCE")
+                ?? throw new InvalidOperationException("AZURE_INSTANCE missing");
 
-            ValidIssuer = jwtSettings?.Issuer,
-            ValidAudience = jwtSettings?.Audience,
+            identityOptions.TenantId =
+                Environment.GetEnvironmentVariable("AZURE_TENANT_ID")
+                ?? throw new InvalidOperationException("AZURE_TENANT_ID missing");
+
+            identityOptions.ClientId =
+                Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
+                ?? throw new InvalidOperationException("AZURE_CLIENT_ID missing");
+        });
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true,
+
+//             ValidIssuer = jwtSettings?.Issuer,
+//             ValidAudience = jwtSettings?.Audience,
 
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings.Key)
-            )
-        };
-    });
+//             IssuerSigningKey = new SymmetricSecurityKey(
+//                 Encoding.UTF8.GetBytes(jwtSettings.Key)
+//             )
+//         };
+//     });
 
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
+var clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
+    ?? throw new InvalidOperationException("AZURE_CLIENT_ID missing");
 
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Bearer",
+    options.AddSecurityDefinition("oauth2",
         new OpenApiSecurityScheme
         {
-            Name = "Authorization",
-            Type = SecuritySchemeType.Http,
-            Scheme = "bearer",
-            BearerFormat = "JWT",
-            In = ParameterLocation.Header,
-            Description = "Enter your JWT token"
+            Type = SecuritySchemeType.OAuth2,
+            Flows = new OpenApiOAuthFlows
+            {
+                AuthorizationCode = new OpenApiOAuthFlow
+                {
+                    AuthorizationUrl =
+                        new Uri("https://login.microsoftonline.com/bdcfaa46-3f69-4dfd-b3f7-c582bdfbb820/oauth2/v2.0/authorize"),
+
+                    TokenUrl =
+                        new Uri("https://login.microsoftonline.com/bdcfaa46-3f69-4dfd-b3f7-c582bdfbb820/oauth2/v2.0/token"),
+                    
+                    Scopes = new Dictionary<string, string>
+                    {
+                        {
+                            "api://c95c97ec-156c-4cc4-81bd-d23f0daa8ed5/access_as_user",
+                            "Access ContractMaster API"
+                        }
+                    }
+                }
+            }
         });
 
     options.AddSecurityRequirement(document =>
         new OpenApiSecurityRequirement
         {
             [
-                new OpenApiSecuritySchemeReference("Bearer", document)
+                new OpenApiSecuritySchemeReference("oauth2", document)
             ] = []
         });
 });
-
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
@@ -110,7 +150,21 @@ var app = builder.Build();
 app.UseExceptionHandler();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint(
+        "/swagger/v1/swagger.json",
+        "ContractMaster API"
+    );
+
+    options.OAuthClientId(
+        Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
+        ?? throw new InvalidOperationException("AZURE_CLIENT_ID missing")
+    );
+
+    options.OAuthUsePkce();
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

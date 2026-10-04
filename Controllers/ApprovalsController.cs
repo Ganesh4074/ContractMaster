@@ -3,6 +3,7 @@ using ContractMaster.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using ContractMaster.Services.Interfaces;
+using ContractMaster.Models.Enums;
 namespace ContractMaster.Controllers;
 
 [ApiController]
@@ -47,6 +48,14 @@ public class ApprovalsController : ControllerBase
         int userId=int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var approval = await _approvalService.UpdateApproval(id, update,userId, userRole!);
         return approval is null ? NotFound() : Ok(approval);
+    }
+    [HttpGet("type")]
+    public async Task<IActionResult> GetApprovalsByType(
+        [FromQuery] ApproverType approverType)
+    {
+        var approvals = await _approvalService.GetApprovalsByType(approverType);
+
+        return Ok(approvals);
     }
 
 }

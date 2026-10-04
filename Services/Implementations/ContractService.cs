@@ -3,20 +3,25 @@ using ContractMaster.Exceptions;
 using ContractMaster.Models;
 using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
+using ContractMaster.Services.Interfaces;
 
 namespace ContractMaster.Services;
 
 public class ContractService:IContractService
 {
     private readonly IContractRepository _repository;
-    public ContractService(IContractRepository repository)
+    private readonly IPdfService _pdfService;
+    private readonly IBlobStorageService _blobStorageService;
+    public ContractService(IContractRepository repository, IPdfService pdfService, IBlobStorageService blobStorageService)
     {
+        _pdfService=pdfService;
         _repository = repository;
+        _blobStorageService=blobStorageService;
     }
 
-    public async Task CreateContract(NewContractDTO newContract, int userId)
+    public async Task CreateContract(NewContractDTO newContract, string email)
     {
-        var exists = await _repository.ExistsAsync(newContract.ContractId, newContract.Version);
+        var exists = await _repository.ExistsAsync(newContract.ContractNumber, newContract.Version);
 
         if (exists)
         {
@@ -25,7 +30,7 @@ public class ContractService:IContractService
 
         Contract contract = new()
         {
-            ContractId = newContract.ContractId,
+            ContractNumber = newContract.ContractNumber,
             Version = newContract.Version,
             ContractType = newContract.ContractType,
             Status = newContract.Status,
@@ -33,9 +38,14 @@ public class ContractService:IContractService
             EndDate = newContract.EndDate,
             CounterPartyName = newContract.CounterPartyName,
             CounterPartyEmail = newContract.CounterPartyEmail,
-            CreatedById = userId,
+            CreatedByEmail = email,
             CreatedAt = newContract.CreatedAt
         };
+        var pdf = _pdfService.GenerateContractPdf(contract);
+        var blobName = $"contracts/{contract.ContractNumber}/v{contract.Version}.pdf";
+        await _blobStorageService.UploadPdfAsync(pdf, contract.ContractNumber.ToString(), contract.Version);
+
+        contract.PdfBlobName = blobName;
 
         await _repository.AddAsync(contract);
 
@@ -47,12 +57,13 @@ public class ContractService:IContractService
 
         return contracts.Select(contract => new ContractDTO(
             contract.Id,
-            contract.ContractId,
+            contract.ContractNumber,
             contract.Version,
             contract.ContractType,
             contract.Status,
             contract.StartDate,
             contract.EndDate,
+            contract.CreatedByEmail,
             contract.CounterPartyName,
             contract.CounterPartyEmail,
             contract.CreatedAt

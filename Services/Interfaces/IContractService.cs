@@ -5,7 +5,7 @@ namespace ContractMaster.Services;
 
 public interface IContractService
 {
-    Task CreateContract(NewContractDTO newContract, int userId);
+    Task CreateContract(NewContractDTO newContract, string email);
 
     Task<List<ContractDTO>> GetContracts();
 

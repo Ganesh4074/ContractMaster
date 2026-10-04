@@ -141,4 +141,20 @@ public class ApprovalService:IApprovalService
             approval.RejectedAt
         );
     }
+    public async Task<List<GetApprovalDTO>> GetApprovalsByType(ApproverType approverType)
+    {
+        var approvals = await _repository.GetByApproverTypeAsync(approverType);
+
+        return approvals.Select(approval => new GetApprovalDTO(
+            approval.Id,
+            approval.ContractId,
+            approval.Version,
+            approval.Sequence,
+            approval.ApproverId,
+            approval.ApproverType,
+            approval.ApprovalStatus,
+            approval.ApprovedAt,
+            approval.RejectedAt
+        )).ToList();
+    }
 }

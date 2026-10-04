@@ -37,7 +37,7 @@ public class ContractRepository : IContractRepository
     }
     public async Task<bool> ExistsAsync(int contractId, int version)
     {
-        return await _db.Contracts.AnyAsync(contract=> contract.ContractId==contractId && contract.Version==version);
+        return await _db.Contracts.AnyAsync(contract=> contract.ContractNumber==contractId && contract.Version==version);
     }
     public async Task UpdateAsync(Contract contract)
     {
@@ -47,7 +47,7 @@ public class ContractRepository : IContractRepository
     public async Task<Contract?> GetByContractAndVersionAsync(int contractId, int version)
     {
         return await _db.Contracts.FirstOrDefaultAsync(contract =>
-                contract.ContractId == contractId &&
+                contract.ContractNumber == contractId &&
                 contract.Version == version);
     }
 }

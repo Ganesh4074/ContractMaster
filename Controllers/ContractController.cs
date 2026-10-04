@@ -19,12 +19,13 @@ public class ContractController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles =RoleNames.Sales)]
+    [Authorize]
     public async Task<IActionResult> Create(NewContractDTO newContract)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var email = User.FindFirstValue(ClaimTypes.Upn);
+
         
-        await _contractService.CreateContract(newContract, userId);
+        await _contractService.CreateContract(newContract, email);
         return Ok();
     }
 

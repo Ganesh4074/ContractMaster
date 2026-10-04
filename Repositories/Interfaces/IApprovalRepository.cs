@@ -1,4 +1,5 @@
 using ContractMaster.Models;
+using ContractMaster.Models.Enums;
 
 namespace ContractMaster.Repositories.Interfaces;
 
@@ -10,4 +11,5 @@ public interface IApprovalRepository
     Task UpdateAsync(Approvals approval);
     Task<List<Approvals>> GetByContractAndVersionAsync(int contractId, int version);
     Task AddRangeAsync(List<Approvals> approvals);
+    Task<List<Approvals>> GetByApproverTypeAsync(ApproverType approverType);
 }

@@ -1,5 +1,6 @@
 using ContractMaster.Data;
 using ContractMaster.Models;
+using ContractMaster.Models.Enums;
 using ContractMaster.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,5 +46,11 @@ public class ApprovalRepository : IApprovalRepository
     {
         await _db.Approvals.AddRangeAsync(approvals);
         await _db.SaveChangesAsync();
+    }
+    public async Task<List<Approvals>> GetByApproverTypeAsync(ApproverType approverType)
+    {
+        return await _db.Approvals
+            .Where(a => a.ApproverType == approverType)
+            .ToListAsync();
     }
 }

@@ -3,7 +3,7 @@ using ContractMaster.Models.Enums;
 namespace ContractMaster.DTOs;
 
 public record NewContractDTO(
-    int ContractId,
+    int ContractNumber,
     int Version,
     ContractType ContractType,
     ContractStatus Status,
